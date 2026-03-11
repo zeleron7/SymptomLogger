@@ -1,0 +1,6 @@
+@SymptomLogger_HostAddress = http://localhost:7109
+
+GET {{SymptomLogger_HostAddress}}/Symptoms/
+Accept: application/json
+
+###
