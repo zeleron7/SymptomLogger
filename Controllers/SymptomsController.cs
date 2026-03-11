@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SymptomLogger.Data;
 using SymptomLogger.Models;
+using SymptomLogger.Services;
 
 namespace SymptomLogger.Controllers
 {
@@ -15,17 +16,20 @@ namespace SymptomLogger.Controllers
     public class SymptomsController : ControllerBase
     {
         private readonly SymptomLoggerContext _context;
+        private readonly ISymptomService _symptomService;
 
-        public SymptomsController(SymptomLoggerContext context)
+        public SymptomsController(SymptomLoggerContext context, ISymptomService service)
         {
             _context = context;
+            _symptomService = service;
         }
 
         // GET: api/Symptoms
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Symptom>>> GetSymptom()
+        public async Task<ActionResult<List<Symptom>>> GetAllSymptoms()
         {
-            return await _context.Symptom.ToListAsync();
+            var symptoms = await _symptomService.GetSymptomsAsync();
+            return Ok(symptoms);
         }
 
         // GET: api/Symptoms/5

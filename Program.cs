@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 using SymptomLogger.Data;
+using SymptomLogger.Repositories.Interfaces;
+using SymptomLogger.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SymptomLoggerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SymptomLoggerContext") ?? throw new InvalidOperationException("Connection string 'SymptomLoggerContext' not found.")));
@@ -12,6 +14,10 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 builder.Services.AddEndpointsApiExplorer();
+
+// DI Symptoms
+builder.Services.AddScoped<ISymptomRepository, SymptomRepository>();
+builder.Services.AddScoped<ISymptomService, SymptomService>();
 
 // Swagger
 builder.Services.AddSwaggerGen(options =>
