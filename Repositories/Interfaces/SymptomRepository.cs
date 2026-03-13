@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using SymptomLogger.Data;
 using SymptomLogger.Models;
 
@@ -20,20 +21,26 @@ namespace SymptomLogger.Repositories.Interfaces
 
         public async Task<Symptom> GetSymptomById(int id)
         {
+            if (id <= 0)
+            {
+                throw new ArgumentException("Invalid symptom ID.", nameof(id));
+            }
             return await _context.Symptom.FindAsync(id);
         }
 
         public async Task<Symptom> AddSymptom(Symptom symptom)
         {
-            _context.Symptom.Add(symptom);
+            await _context.Symptom.AddAsync(symptom);
             await _context.SaveChangesAsync();
+
             return symptom;
         }
 
         public async Task<Symptom> UpdateSymptom(Symptom symptom)
         {
-            _context.Entry(symptom).State = EntityState.Modified;
+            _context.Symptom.Update(symptom);
             await _context.SaveChangesAsync();
+
             return symptom;
         }
 
@@ -41,10 +48,14 @@ namespace SymptomLogger.Repositories.Interfaces
         {
             var symptom = await _context.Symptom.FindAsync(id);
             if (symptom == null)
+            {
+                // validering
                 return false;
+            }
 
             _context.Symptom.Remove(symptom);
             await _context.SaveChangesAsync();
+
             return true;
         }
     }

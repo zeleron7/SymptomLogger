@@ -14,6 +14,6 @@ namespace SymptomLogger.Data
         {
         }
 
-        public DbSet<Symptom> Symptom { get; set; } = default!;
+        public DbSet<Symptom> Symptom { get; set; }
     }
 }

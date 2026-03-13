@@ -25,88 +25,99 @@ namespace SymptomLogger.Controllers
         }
 
         // GET: api/Symptoms
-        [HttpGet]
+        [HttpGet] // ALL SYMPTOMS
         public async Task<ActionResult<List<Symptom>>> GetAllSymptoms()
         {
-            var symptoms = await _symptomService.GetSymptomsAsync();
-            return Ok(symptoms);
+            try
+            {
+                var symptoms = await _symptomService.GetSymptomsAsync();
+                return Ok(symptoms);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (not implemented here)
+                return StatusCode(500, "An error occurred while retrieving symptoms.");
+            }
         }
 
         // GET: api/Symptoms/5
-        [HttpGet("{id}")]
+        [HttpGet("{id}")] // SYMPTOM BY ID
         public async Task<ActionResult<Symptom>> GetSymptom(int id)
         {
-            var symptom = await _context.Symptom.FindAsync(id);
-
-            if (symptom == null)
-            {
-                return NotFound();
-            }
-
-            return symptom;
-        }
-
-        // PUT: api/Symptoms/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSymptom(int id, Symptom symptom)
-        {
-            if (id != symptom.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(symptom).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!SymptomExists(id))
+                var symptom = await _symptomService.GetSymptomByIdAsync(id);
+                if (symptom == null)
                 {
                     return NotFound();
                 }
-                else
+                return Ok(symptom);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (not implemented here)
+                return StatusCode(500, "An error occurred while retrieving the symptom.");
+            }
+        }
+
+        // PUT: api/Symptoms/5
+        [HttpPut("{id}")] // UPDATE SYMPTOM
+        public async Task<IActionResult> PutSymptom(int id, Symptom symptom)
+        {
+            try
+            {
+                if (id != symptom.Id)
                 {
-                    throw;
+                    return BadRequest();
                 }
+
+                var updatedSymptom = await _symptomService.UpdateSymptomAsync(symptom);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (not implemented here)
+                return StatusCode(500, "An error occurred while updating the symptom.");
             }
 
-            return NoContent();
+            return Ok(symptom);
         }
 
         // POST: api/Symptoms
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [HttpPost] // CREATE SYMPTOM
         public async Task<ActionResult<Symptom>> PostSymptom(Symptom symptom)
         {
-            _context.Symptom.Add(symptom);
-            await _context.SaveChangesAsync();
+            try
+             {
+                var createdSymptom = await _symptomService.AddSymptomAsync(symptom);
+                return Ok(createdSymptom);
+            }
 
-            return CreatedAtAction("GetSymptom", new { id = symptom.Id }, symptom);
+            catch (Exception ex)
+            {
+                // Log the exception (not implemented here)
+                return StatusCode(500, "An error occurred while creating the symptom.");
+            }
+
         }
 
         // DELETE: api/Symptoms/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}")] // DELETE SYMPTOM
         public async Task<IActionResult> DeleteSymptom(int id)
         {
-            var symptom = await _context.Symptom.FindAsync(id);
-            if (symptom == null)
+            try
             {
-                return NotFound();
+                var success = await _symptomService.DeleteSymptomAsync(id);
+                if (!success)
+                {
+                    return NotFound();
+                }
+                return NoContent();
             }
-
-            _context.Symptom.Remove(symptom);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool SymptomExists(int id)
-        {
-            return _context.Symptom.Any(e => e.Id == id);
+            catch (Exception ex)
+            {
+                // Log the exception (not implemented here)
+                return StatusCode(500, "An error occurred while deleting the symptom.");
+            }
         }
     }
 }
