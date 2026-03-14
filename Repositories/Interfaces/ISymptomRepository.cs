@@ -1,4 +1,5 @@
-﻿using SymptomLogger.Models;
+﻿using SymptomLogger.DTO;
+using SymptomLogger.Models;
 
 namespace SymptomLogger.Repositories.Interfaces
 {

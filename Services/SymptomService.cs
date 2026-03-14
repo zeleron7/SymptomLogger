@@ -1,4 +1,5 @@
 ﻿using SymptomLogger.Data;
+using SymptomLogger.DTO;
 using SymptomLogger.Models;
 using SymptomLogger.Repositories.Interfaces;
 using System.Net;
@@ -16,11 +17,13 @@ namespace SymptomLogger.Services
             _context = Context;
         }
 
+        // Get all symptoms
         public async Task<IEnumerable<Symptom>> GetSymptomsAsync()
         {
             return await _symptomRepository.GetSymptoms();
         }
 
+        // Get symptom by ID
         public async Task<Symptom> GetSymptomByIdAsync(int id)
         {
             // Validera / fixa med loggning?
@@ -28,15 +31,24 @@ namespace SymptomLogger.Services
             return await _symptomRepository.GetSymptomById(id);
         }
 
-        public async Task<Symptom> AddSymptomAsync(Symptom symptom)
+        // Add new symptom
+        public async Task<Symptom> AddSymptomAsync(CreateSymptomDTO dto)
         {
-
             try
             {
-                if (symptom == null)
+                if (dto == null)
                 {
-                    throw new ArgumentNullException(nameof(symptom), "Symptom cannot be null.");
+                    throw new ArgumentNullException(nameof(dto), "Symptom cannot be null.");
                 }
+
+                // Bind the DTO to the Symptom model
+                var symptom = new Symptom
+                {
+                    Type = dto.Type,
+                    Description = dto.Description,
+                    Name = dto.Name,
+                    Severity = dto.Severity
+                };
 
                 return await _symptomRepository.AddSymptom(symptom);
             }
@@ -48,11 +60,15 @@ namespace SymptomLogger.Services
             }
         }
 
+        // Update existing symptom
         public async Task<Symptom> UpdateSymptomAsync(Symptom symptom)
         {
+            // Validera / fixa med loggning?
+
             return await _symptomRepository.UpdateSymptom(symptom);
         }
 
+        // Delete symptom by ID
         public async Task<bool> DeleteSymptomAsync(int id)
         {
             return await _symptomRepository.DeleteSymptom(id);

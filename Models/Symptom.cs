@@ -7,11 +7,8 @@ namespace SymptomLogger.Models
         [Key]
         public int Id { get; set; }
 
-        // Adding a Type property to categorize symptoms (e.g., "Physical", "Emotional", "Cognitive")
-
-        [Required]
+        // Type of symptom (e.g., headache, fatigue, etc.)
         public string Type { get; set; }
-        [Required]
         public string Description { get; set; }
         public string Name { get; set; }
         public DateTime Date { get; set; }

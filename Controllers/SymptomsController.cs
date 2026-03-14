@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using SymptomLogger.Data;
 using SymptomLogger.Models;
 using SymptomLogger.Services;
+using SymptomLogger.DTO;
 
 namespace SymptomLogger.Controllers
 {
@@ -84,11 +85,23 @@ namespace SymptomLogger.Controllers
 
         // POST: api/Symptoms
         [HttpPost] // CREATE SYMPTOM
-        public async Task<ActionResult<Symptom>> PostSymptom(Symptom symptom)
+        public async Task<ActionResult<Symptom>> PostSymptom(CreateSymptomDTO dto)
         {
+            // Check if Description is either empty or over 100 characters
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // validate default value 
+            if (dto.Description == "string")
+            {
+                return BadRequest("Please describe your symptoms.");
+            }
+
             try
-             {
-                var createdSymptom = await _symptomService.AddSymptomAsync(symptom);
+            {
+                var createdSymptom = await _symptomService.AddSymptomAsync(dto);
                 return Ok(createdSymptom);
             }
 

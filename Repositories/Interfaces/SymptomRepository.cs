@@ -14,20 +14,19 @@ namespace SymptomLogger.Repositories.Interfaces
             _context = context;
         }
 
+        // Get all symptoms
         public async Task<IEnumerable<Symptom>> GetSymptoms()
         {
             return await _context.Symptom.ToListAsync();
         }
 
+        // Get symptom by ID
         public async Task<Symptom> GetSymptomById(int id)
         {
-            if (id <= 0)
-            {
-                throw new ArgumentException("Invalid symptom ID.", nameof(id));
-            }
             return await _context.Symptom.FindAsync(id);
         }
 
+        // Add new symptom
         public async Task<Symptom> AddSymptom(Symptom symptom)
         {
             await _context.Symptom.AddAsync(symptom);
@@ -36,6 +35,7 @@ namespace SymptomLogger.Repositories.Interfaces
             return symptom;
         }
 
+        // Update existing symptom
         public async Task<Symptom> UpdateSymptom(Symptom symptom)
         {
             _context.Symptom.Update(symptom);
@@ -44,15 +44,16 @@ namespace SymptomLogger.Repositories.Interfaces
             return symptom;
         }
 
+        // Delete symptom by ID
         public async Task<bool> DeleteSymptom(int id)
         {
-            var symptom = await _context.Symptom.FindAsync(id);
-            if (symptom == null)
+
+            /*if (symptom == null)
             {
                 // validering
                 return false;
-            }
-
+            }*/
+            var symptom = await _context.Symptom.FindAsync(id);
             _context.Symptom.Remove(symptom);
             await _context.SaveChangesAsync();
 
