@@ -1,17 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SymptomLogger.Models
+namespace SymptomLogger.src.DTO
 {
-    public class Symptom
+    public class CreateSymptomDTO
     {
-        [Key]
-        public int Id { get; set; }
-
-        // Type of symptom (e.g., headache, fatigue, etc.)
         public string Type { get; set; }
+        [Required(ErrorMessage = "The Description is required.")]
+        [StringLength(100, ErrorMessage = "The description must be less than 100 characters.")]
         public string Description { get; set; }
         public string Name { get; set; }
-        public DateTime Date { get; set; }
         public int Severity { get; set; }
     }
 }

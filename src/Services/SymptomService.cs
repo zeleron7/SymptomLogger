@@ -1,10 +1,10 @@
-﻿using SymptomLogger.Data;
-using SymptomLogger.DTO;
-using SymptomLogger.Models;
-using SymptomLogger.Repositories.Interfaces;
+﻿using SymptomLogger.src.Data;
+using SymptomLogger.src.DTO;
+using SymptomLogger.src.Models;
+using SymptomLogger.src.Repositories.Interfaces;
 using System.Net;
 
-namespace SymptomLogger.Services
+namespace SymptomLogger.src.Services
 {
     public class SymptomService : ISymptomService
     {

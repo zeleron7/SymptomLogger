@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using SymptomLogger.Data;
-using SymptomLogger.Models;
+using SymptomLogger.src.Data;
+using SymptomLogger.src.Models;
 
-namespace SymptomLogger.Repositories.Interfaces
+namespace SymptomLogger.src.Repositories.Interfaces
 {
     public class SymptomRepository : ISymptomRepository
     {
@@ -47,12 +47,6 @@ namespace SymptomLogger.Repositories.Interfaces
         // Delete symptom by ID
         public async Task<bool> DeleteSymptom(int id)
         {
-
-            /*if (symptom == null)
-            {
-                // validering
-                return false;
-            }*/
             var symptom = await _context.Symptom.FindAsync(id);
             _context.Symptom.Remove(symptom);
             await _context.SaveChangesAsync();

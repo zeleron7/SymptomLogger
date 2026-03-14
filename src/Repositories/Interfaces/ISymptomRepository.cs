@@ -1,7 +1,7 @@
-﻿using SymptomLogger.DTO;
-using SymptomLogger.Models;
+﻿//using SymptomLogger.DTO;
+using SymptomLogger.src.Models;
 
-namespace SymptomLogger.Repositories.Interfaces
+namespace SymptomLogger.src.Repositories.Interfaces
 {
     public interface ISymptomRepository
     {
@@ -11,6 +11,5 @@ namespace SymptomLogger.Repositories.Interfaces
         Task<Symptom> AddSymptom(Symptom symptom);
         Task<Symptom> UpdateSymptom(Symptom symptom);
         Task<bool> DeleteSymptom(int id);
-
     }
 }

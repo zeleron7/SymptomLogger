@@ -1,12 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
-using SymptomLogger.Data;
-using SymptomLogger.Repositories.Interfaces;
-using SymptomLogger.Services;
+using SymptomLogger.src.Data;
+using SymptomLogger.src.Repositories.Interfaces;
+using SymptomLogger.src.Services;
+using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SymptomLoggerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SymptomLoggerContext") ?? throw new InvalidOperationException("Connection string 'SymptomLoggerContext' not found.")));
+
+// Serilog configuration
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+   
+builder.Host.UseSerilog();
 
 // Add services to the container.
 

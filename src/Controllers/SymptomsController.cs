@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SymptomLogger.Data;
-using SymptomLogger.Models;
-using SymptomLogger.Services;
-using SymptomLogger.DTO;
+using SymptomLogger.src.Data;
+using SymptomLogger.src.DTO;
+using SymptomLogger.src.Models;
+using SymptomLogger.src.Services;
 
-namespace SymptomLogger.Controllers
+namespace SymptomLogger.src.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -18,11 +18,13 @@ namespace SymptomLogger.Controllers
     {
         private readonly SymptomLoggerContext _context;
         private readonly ISymptomService _symptomService;
+        private readonly ILogger<SymptomsController> _logger;
 
-        public SymptomsController(SymptomLoggerContext context, ISymptomService service)
+        public SymptomsController(SymptomLoggerContext context, ISymptomService service, ILogger<SymptomsController> logger)
         {
             _context = context;
             _symptomService = service;
+            _logger = logger;
         }
 
         // GET: api/Symptoms
@@ -31,12 +33,13 @@ namespace SymptomLogger.Controllers
         {
             try
             {
+                _logger.LogInformation("Retrieving all symptoms.");
                 var symptoms = await _symptomService.GetSymptomsAsync();
                 return Ok(symptoms);
             }
             catch (Exception ex)
             {
-                // Log the exception (not implemented here)
+                _logger.LogError(ex, "An error occurred while retrieving symptoms.");
                 return StatusCode(500, "An error occurred while retrieving symptoms.");
             }
         }
@@ -47,16 +50,18 @@ namespace SymptomLogger.Controllers
         {
             try
             {
+                _logger.LogInformation("Retrieving symptom with ID {SymptomId}.", id);
                 var symptom = await _symptomService.GetSymptomByIdAsync(id);
                 if (symptom == null)
                 {
+                    _logger.LogWarning("Symptom with ID {SymptomId} not found.", id);
                     return NotFound();
                 }
                 return Ok(symptom);
             }
             catch (Exception ex)
             {
-                // Log the exception (not implemented here)
+                _logger.LogError(ex, "An error occurred while retrieving symptom with ID {SymptomId}.", id);
                 return StatusCode(500, "An error occurred while retrieving the symptom.");
             }
         }
@@ -69,14 +74,16 @@ namespace SymptomLogger.Controllers
             {
                 if (id != symptom.Id)
                 {
+                    _logger.LogWarning("Symptom ID in the URL does not match the ID in the body. URL ID: {UrlId}, Body ID: {BodyId}.", id, symptom.Id);
                     return BadRequest();
                 }
 
                 var updatedSymptom = await _symptomService.UpdateSymptomAsync(symptom);
+                _logger.LogInformation("Symptom with ID {SymptomId} updated successfully.", id);
             }
             catch (Exception ex)
             {
-                // Log the exception (not implemented here)
+                _logger.LogError(ex, "An error occurred while updating symptom with ID {SymptomId}.", id);
                 return StatusCode(500, "An error occurred while updating the symptom.");
             }
 
@@ -90,12 +97,14 @@ namespace SymptomLogger.Controllers
             // Check if Description is either empty or over 100 characters
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Invalid model state for creating symptom. Errors: {ModelErrors}.", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
                 return BadRequest(ModelState);
             }
 
             // validate default value 
             if (dto.Description == "string")
             {
+                _logger.LogWarning("Default value for Description field detected. Please provide a valid description.");
                 return BadRequest("Please describe your symptoms.");
             }
 
@@ -107,7 +116,7 @@ namespace SymptomLogger.Controllers
 
             catch (Exception ex)
             {
-                // Log the exception (not implemented here)
+                _logger.LogError(ex, "An error occurred while creating a new symptom.");
                 return StatusCode(500, "An error occurred while creating the symptom.");
             }
 
@@ -120,15 +129,18 @@ namespace SymptomLogger.Controllers
             try
             {
                 var success = await _symptomService.DeleteSymptomAsync(id);
+                _logger.LogInformation("Attempting to delete symptom with ID {SymptomId}. Success: {Success}.", id, success);
+
                 if (!success)
                 {
+                    _logger.LogWarning("Symptom with ID {SymptomId} not found for deletion.", id);
                     return NotFound();
                 }
                 return NoContent();
             }
             catch (Exception ex)
             {
-                // Log the exception (not implemented here)
+                _logger.LogError(ex, "An error occurred while deleting symptom with ID {SymptomId}.", id);
                 return StatusCode(500, "An error occurred while deleting the symptom.");
             }
         }

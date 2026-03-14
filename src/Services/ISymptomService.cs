@@ -1,7 +1,7 @@
-﻿using SymptomLogger.DTO;
-using SymptomLogger.Models;
+﻿using SymptomLogger.src.DTO;
+using SymptomLogger.src.Models;
 
-namespace SymptomLogger.Services
+namespace SymptomLogger.src.Services
 {
     public interface ISymptomService
     {
