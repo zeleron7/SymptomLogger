@@ -5,7 +5,7 @@ namespace SymptomLogger.src.Models
     public class Symptom
     {
         [Key]
-        public int Id { get; set; }
+        public int SymptomId { get; set; }
 
         // Type of symptom (e.g., headache, fatigue, etc.)
         public string Type { get; set; }

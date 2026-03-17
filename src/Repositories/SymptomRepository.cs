@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SymptomLogger.src.Data;
+using SymptomLogger.src.DTO;
 using SymptomLogger.src.Models;
+using SymptomLogger.src.Repositories.Interfaces;
 
-namespace SymptomLogger.src.Repositories.Interfaces
+namespace SymptomLogger.src.Repositories
 {
     public class SymptomRepository : ISymptomRepository
     {

@@ -22,13 +22,13 @@ namespace SymptomLogger.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SymptomLogger.Models.Symptom", b =>
+            modelBuilder.Entity("SymptomLogger.src.Models.Symptom", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("SymptomId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SymptomId"));
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -48,7 +48,7 @@ namespace SymptomLogger.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("SymptomId");
 
                     b.ToTable("Symptom");
                 });

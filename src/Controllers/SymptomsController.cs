@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SymptomLogger.src.Data;
 using SymptomLogger.src.DTO;
 using SymptomLogger.src.Models;
+using SymptomLogger.src.Repositories.Interfaces;
 using SymptomLogger.src.Services;
 
 namespace SymptomLogger.src.Controllers
@@ -16,19 +19,19 @@ namespace SymptomLogger.src.Controllers
     [ApiController]
     public class SymptomsController : ControllerBase
     {
-        private readonly SymptomLoggerContext _context;
         private readonly ISymptomService _symptomService;
         private readonly ILogger<SymptomsController> _logger;
 
-        public SymptomsController(SymptomLoggerContext context, ISymptomService service, ILogger<SymptomsController> logger)
+        public SymptomsController(ISymptomService symptomService, ILogger<SymptomsController> logger)
         {
-            _context = context;
-            _symptomService = service;
+            _symptomService = symptomService;
             _logger = logger;
         }
 
         // GET: api/Symptoms
-        [HttpGet] // ALL SYMPTOMS
+        #region Get all symptoms
+
+        [HttpGet("GetAll")] 
         public async Task<ActionResult<List<Symptom>>> GetAllSymptoms()
         {
             try
@@ -43,9 +46,12 @@ namespace SymptomLogger.src.Controllers
                 return StatusCode(500, "An error occurred while retrieving symptoms.");
             }
         }
+        #endregion
 
         // GET: api/Symptoms/5
-        [HttpGet("{id}")] // SYMPTOM BY ID
+        #region Get symptom by ID
+
+        [HttpGet("{id}")] 
         public async Task<ActionResult<Symptom>> GetSymptom(int id)
         {
             try
@@ -65,20 +71,24 @@ namespace SymptomLogger.src.Controllers
                 return StatusCode(500, "An error occurred while retrieving the symptom.");
             }
         }
+        #endregion
 
-        // PUT: api/Symptoms/5
-        [HttpPut("{id}")] // UPDATE SYMPTOM
-        public async Task<IActionResult> PutSymptom(int id, Symptom symptom)
+        // Patch: api/Symptoms/5 
+        // Try this endpoint with postman or change JSON format [{"op": "replace", "path": "/description", "value": "Updated description"}]
+        #region Update symptom
+
+        [HttpPatch("{id}")] 
+        public async Task<IActionResult> PatchSymptom(int id, [FromBody] JsonPatchDocument<UpdateSymptomDTO> patchDoc)
         {
             try
             {
-                if (id != symptom.Id)
+                if (patchDoc == null)
                 {
-                    _logger.LogWarning("Symptom ID in the URL does not match the ID in the body. URL ID: {UrlId}, Body ID: {BodyId}.", id, symptom.Id);
-                    return BadRequest();
+                    _logger.LogWarning("Patch document is null for symptom with ID {SymptomId}.", id);
+                    return BadRequest("Patch document cannot be null.");
                 }
 
-                var updatedSymptom = await _symptomService.UpdateSymptomAsync(symptom);
+                var updatedSymptom = await _symptomService.UpdateSymptomAsync(id, patchDoc);
                 _logger.LogInformation("Symptom with ID {SymptomId} updated successfully.", id);
             }
             catch (Exception ex)
@@ -87,11 +97,14 @@ namespace SymptomLogger.src.Controllers
                 return StatusCode(500, "An error occurred while updating the symptom.");
             }
 
-            return Ok(symptom);
+            return Ok();
         }
+        #endregion
 
         // POST: api/Symptoms
-        [HttpPost] // CREATE SYMPTOM
+        #region Create new symptom
+
+        [HttpPost] 
         public async Task<ActionResult<Symptom>> PostSymptom(CreateSymptomDTO dto)
         {
             // Check if Description is either empty or over 100 characters
@@ -119,11 +132,13 @@ namespace SymptomLogger.src.Controllers
                 _logger.LogError(ex, "An error occurred while creating a new symptom.");
                 return StatusCode(500, "An error occurred while creating the symptom.");
             }
-
         }
+        #endregion
 
         // DELETE: api/Symptoms/5
-        [HttpDelete("{id}")] // DELETE SYMPTOM
+        #region Delete symptom
+
+        [HttpDelete("{id}")] 
         public async Task<IActionResult> DeleteSymptom(int id)
         {
             try
@@ -144,5 +159,6 @@ namespace SymptomLogger.src.Controllers
                 return StatusCode(500, "An error occurred while deleting the symptom.");
             }
         }
+        #endregion 
     }
 }
