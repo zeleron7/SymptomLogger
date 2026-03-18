@@ -7,6 +7,7 @@ using SymptomLogger.src.Services;
 using Serilog;
 using SymptomLogger.src.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SymptomLoggerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SymptomLoggerContext") ?? throw new InvalidOperationException("Connection string 'SymptomLoggerContext' not found.")));
@@ -29,6 +30,9 @@ builder.Services.AddControllers()
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 builder.Services.AddEndpointsApiExplorer();
+
+// AutoMapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // DI Symptoms
 builder.Services.AddScoped<ISymptomRepository, SymptomRepository>();

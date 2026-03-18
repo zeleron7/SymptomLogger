@@ -1,4 +1,5 @@
-﻿using Azure;
+﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.JsonPatch;
 using SymptomLogger.src.Data;
 using SymptomLogger.src.DTO;
@@ -10,32 +11,41 @@ namespace SymptomLogger.src.Services
 {
     public class SymptomService : ISymptomService
     {
-        public readonly ISymptomRepository _symptomRepository;
-        public readonly SymptomLoggerContext _context;
-        public readonly ILogger<SymptomService> _logger;
+        private readonly ISymptomRepository _symptomRepository;
+        private readonly SymptomLoggerContext _context;
+        private readonly ILogger<SymptomService> _logger;
+        private readonly IMapper _mapper;
 
-        public SymptomService(ISymptomRepository symptomRepository, SymptomLoggerContext context, ILogger<SymptomService> logger)
+        public SymptomService(ISymptomRepository symptomRepository, SymptomLoggerContext context, ILogger<SymptomService> logger,
+            IMapper mapper)
         {
             _symptomRepository = symptomRepository;
             _context = context;
             _logger = logger;
+            _mapper = mapper;
         }
 
         // Get all symptoms
-        public async Task<IEnumerable<Symptom>> GetSymptomsAsync()
+        #region GetSymptomsAsync
+        public async Task<IEnumerable<ResponseSymptomDTO>> GetSymptomsAsync()
         {
-            return await _symptomRepository.GetSymptoms();
+            var Symptoms = await _symptomRepository.GetSymptoms();
+            return _mapper.Map<IEnumerable<ResponseSymptomDTO>>(Symptoms);
         }
+        #endregion
 
         // Get symptom by ID
-        public async Task<Symptom> GetSymptomByIdAsync(int id)
+        #region GetSymptomByIdAsync
+        public async Task<ResponseSymptomDTO> GetSymptomByIdAsync(int id)
         {
-            return await _symptomRepository.GetSymptomById(id);
+            var SymptomById = await _symptomRepository.GetSymptomById(id);
+            return _mapper.Map<ResponseSymptomDTO>(SymptomById);
         }
+        #endregion 
 
         // Add new symptom
         #region AddSymptomAsync
-        public async Task<Symptom> AddSymptomAsync(CreateSymptomDTO dto)
+        public async Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto)
         {
             try
             {
@@ -45,16 +55,11 @@ namespace SymptomLogger.src.Services
                     throw new ArgumentNullException(nameof(dto), "Symptom cannot be null.");
                 }
 
-                // Bind the DTO to the Symptom model
-                var symptom = new Symptom
-                {
-                    Type = dto.Type,
-                    Description = dto.Description,
-                    Name = dto.Name,
-                    Severity = dto.Severity
-                };
+                // map DTO to entity
+                var symptom = _mapper.Map<Symptom>(dto);
 
-                return await _symptomRepository.AddSymptom(symptom);
+                var CreatedSymptom = await _symptomRepository.AddSymptom(symptom);
+                return _mapper.Map<ResponseSymptomDTO>(CreatedSymptom);
             }
 
             catch (Exception ex)
@@ -67,7 +72,7 @@ namespace SymptomLogger.src.Services
 
         // Update symptom
         #region UpdateSymptomAsync
-        public async Task<Symptom> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc)
+        public async Task<ResponseSymptomDTO> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc)
         {
             var updatedSymptom = await _context.Symptom.FindAsync(id);
 
@@ -93,15 +98,18 @@ namespace SymptomLogger.src.Services
             updatedSymptom.Name = dto.Name ?? updatedSymptom.Name;
             updatedSymptom.Severity = dto.Severity ?? updatedSymptom.Severity;
 
-            return await _symptomRepository.UpdateSymptom(updatedSymptom);
+            var UpdatedSymptom = await _symptomRepository.UpdateSymptom(updatedSymptom);
+            return _mapper.Map<ResponseSymptomDTO>(UpdatedSymptom);
         }
-        #endregion 
+        #endregion
 
         // Delete symptom by ID
+        #region DeleteSymptomAsync
         public async Task<bool> DeleteSymptomAsync(int id)
         {
             return await _symptomRepository.DeleteSymptom(id);
         }
+        #endregion 
 
     }
 }

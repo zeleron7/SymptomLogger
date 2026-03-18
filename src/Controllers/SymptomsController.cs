@@ -90,14 +90,14 @@ namespace SymptomLogger.src.Controllers
 
                 var updatedSymptom = await _symptomService.UpdateSymptomAsync(id, patchDoc);
                 _logger.LogInformation("Symptom with ID {SymptomId} updated successfully.", id);
+
+                return Ok(updatedSymptom);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating symptom with ID {SymptomId}.", id);
                 return StatusCode(500, "An error occurred while updating the symptom.");
             }
-
-            return Ok();
         }
         #endregion
 
