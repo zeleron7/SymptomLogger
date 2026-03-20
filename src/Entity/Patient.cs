@@ -6,14 +6,11 @@ namespace SymptomLogger.src.Entity
 {
     public class Patient : IdentityUser
     {
-        [Key]
-        public int PatiendId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Email { get; set; }
+        public override string Email { get; set; } = string.Empty;
         public int Age { get; set; }
 
-        // Patient can have multiple symptoms
-        //public List<Symptom> Symptoms { get; set; }
+        public List<Symptom> Symptoms { get; set; } = new List<Symptom>();
     }
 }

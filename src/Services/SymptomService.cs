@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Azure;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.EntityFrameworkCore;
 using SymptomLogger.src.Data;
 using SymptomLogger.src.DTO;
 using SymptomLogger.src.Models;
 using SymptomLogger.src.Repositories.Interfaces;
 using System.Net;
+using System.Security.Claims;
 
 namespace SymptomLogger.src.Services
 {
@@ -45,7 +47,7 @@ namespace SymptomLogger.src.Services
 
         // Add new symptom
         #region AddSymptomAsync
-        public async Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto)
+        public async Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto, ClaimsPrincipal patient)
         {
             try
             {
@@ -57,6 +59,29 @@ namespace SymptomLogger.src.Services
 
                 // map DTO to entity
                 var symptom = _mapper.Map<Symptom>(dto);
+
+                // Extract the user ID from the claims
+                var PatientId = patient.Claims
+                .Where(c => c.Type == ClaimTypes.NameIdentifier && Guid.TryParse(c.Value, out _))
+                .Select(c => c.Value)
+                .FirstOrDefault();
+
+                if (string.IsNullOrEmpty(PatientId))
+                {
+                    _logger.LogWarning("No valid GUID PatientId found in claims.");
+                    throw new Exception("Authenticated patient ID not found.");
+                }
+
+                // Ensure the patient exists
+                var patientEntity = await _context.Patient.FirstOrDefaultAsync(p => p.Id == PatientId);
+                if (patientEntity == null)
+                {
+                    _logger.LogWarning("Patient with ID {UserId} not found.", PatientId);
+                    throw new Exception("Patient not found.");
+                }
+
+                // Assign the userId as the PatientId foreign key
+                symptom.PatientId = PatientId;
 
                 var CreatedSymptom = await _symptomRepository.AddSymptom(symptom);
                 return _mapper.Map<ResponseSymptomDTO>(CreatedSymptom);

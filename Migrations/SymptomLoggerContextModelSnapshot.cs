@@ -203,9 +203,6 @@ namespace SymptomLogger.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PatiendId")
-                        .HasColumnType("int");
-
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -254,6 +251,10 @@ namespace SymptomLogger.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PatientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Severity")
                         .HasColumnType("int");
 
@@ -262,6 +263,8 @@ namespace SymptomLogger.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("SymptomId");
+
+                    b.HasIndex("PatientId");
 
                     b.ToTable("Symptom");
                 });
@@ -315,6 +318,22 @@ namespace SymptomLogger.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SymptomLogger.src.Models.Symptom", b =>
+                {
+                    b.HasOne("SymptomLogger.src.Entity.Patient", "Patient")
+                        .WithMany("Symptoms")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("SymptomLogger.src.Entity.Patient", b =>
+                {
+                    b.Navigation("Symptoms");
                 });
 #pragma warning restore 612, 618
         }

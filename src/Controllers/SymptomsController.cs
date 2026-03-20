@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,7 @@ namespace SymptomLogger.src.Controllers
 
         // GET: api/Symptoms
         #region Get all symptoms
-
+        [Authorize]
         [HttpGet("GetAll")] 
         public async Task<ActionResult<List<Symptom>>> GetAllSymptoms()
         {
@@ -50,7 +51,7 @@ namespace SymptomLogger.src.Controllers
 
         // GET: api/Symptoms/5
         #region Get symptom by ID
-
+        [Authorize]
         [HttpGet("{id}")] 
         public async Task<ActionResult<Symptom>> GetSymptom(int id)
         {
@@ -103,7 +104,7 @@ namespace SymptomLogger.src.Controllers
 
         // POST: api/Symptoms
         #region Create new symptom
-
+        [Authorize]
         [HttpPost] 
         public async Task<ActionResult<Symptom>> PostSymptom(CreateSymptomDTO dto)
         {
@@ -123,7 +124,7 @@ namespace SymptomLogger.src.Controllers
 
             try
             {
-                var createdSymptom = await _symptomService.AddSymptomAsync(dto);
+                var createdSymptom = await _symptomService.AddSymptomAsync(dto, User);
                 return Ok(createdSymptom);
             }
 

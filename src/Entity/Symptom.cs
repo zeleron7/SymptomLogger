@@ -1,5 +1,6 @@
 ﻿using SymptomLogger.src.Entity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SymptomLogger.src.Models
 {
@@ -15,7 +16,11 @@ namespace SymptomLogger.src.Models
         public DateTime Date { get; set; }
         public int Severity { get; set; }
 
-        // Foreign Key 
-        //public Patient Patient { get; set; }
+        public Patient Patient { get; set; }
+
+        // Foreign key to Patient
+        [ForeignKey("Patient")]
+        public string PatientId { get; set; }
+
     }
 }
