@@ -9,8 +9,8 @@ namespace SymptomLogger.src.Repositories.Interfaces
         // Symptoms
         Task<IEnumerable<Symptom>> GetSymptoms();
         Task<Symptom> GetSymptomById(int id);
-        Task<Symptom> AddSymptom(Symptom symptom);
-        Task<Symptom> UpdateSymptom(Symptom symptom);
+        Task<Symptom> AddSymptom(Symptom symptom, string patientId);
+        Task<Symptom> UpdateSymptom(Symptom symptom, string patientId);
         Task<bool> DeleteSymptom(int id);
     }
 }

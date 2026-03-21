@@ -47,7 +47,7 @@ namespace SymptomLogger.src.Services
 
         // Add new symptom
         #region AddSymptomAsync
-        public async Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto, ClaimsPrincipal patient)
+        public async Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto, string patientId)
         {
             try
             {
@@ -60,30 +60,10 @@ namespace SymptomLogger.src.Services
                 // map DTO to entity
                 var symptom = _mapper.Map<Symptom>(dto);
 
-                // Extract the user ID from the claims
-                var PatientId = patient.Claims
-                .Where(c => c.Type == ClaimTypes.NameIdentifier && Guid.TryParse(c.Value, out _))
-                .Select(c => c.Value)
-                .FirstOrDefault();
+                // set the patientId passed from the controller to ensure the symptom is associated with the correct patient
+                symptom.PatientId = patientId;
 
-                if (string.IsNullOrEmpty(PatientId))
-                {
-                    _logger.LogWarning("No valid GUID PatientId found in claims.");
-                    throw new Exception("Authenticated patient ID not found.");
-                }
-
-                // Ensure the patient exists
-                var patientEntity = await _context.Patient.FirstOrDefaultAsync(p => p.Id == PatientId);
-                if (patientEntity == null)
-                {
-                    _logger.LogWarning("Patient with ID {UserId} not found.", PatientId);
-                    throw new Exception("Patient not found.");
-                }
-
-                // Assign the userId as the PatientId foreign key
-                symptom.PatientId = PatientId;
-
-                var CreatedSymptom = await _symptomRepository.AddSymptom(symptom);
+                var CreatedSymptom = await _symptomRepository.AddSymptom(symptom, patientId);
                 return _mapper.Map<ResponseSymptomDTO>(CreatedSymptom);
             }
 
@@ -97,7 +77,7 @@ namespace SymptomLogger.src.Services
 
         // Update symptom
         #region UpdateSymptomAsync
-        public async Task<ResponseSymptomDTO> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc)
+        public async Task<ResponseSymptomDTO> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc, string patientId)
         {
             var updatedSymptom = await _context.Symptom.FindAsync(id);
 
@@ -123,15 +103,29 @@ namespace SymptomLogger.src.Services
             updatedSymptom.Name = dto.Name ?? updatedSymptom.Name;
             updatedSymptom.Severity = dto.Severity ?? updatedSymptom.Severity;
 
-            var UpdatedSymptom = await _symptomRepository.UpdateSymptom(updatedSymptom);
+            // set the patientId passed from the controller to ensure the symptom is associated with the correct patient
+            updatedSymptom.PatientId = patientId;
+
+            var UpdatedSymptom = await _symptomRepository.UpdateSymptom(updatedSymptom, patientId);
             return _mapper.Map<ResponseSymptomDTO>(UpdatedSymptom);
         }
         #endregion
 
         // Delete symptom by ID
         #region DeleteSymptomAsync
-        public async Task<bool> DeleteSymptomAsync(int id)
+        public async Task<bool> DeleteSymptomAsync(int id, string patientId)
         {
+            var symptom = await _symptomRepository.GetSymptomById(id);
+
+            // null check to prevent null reference exception and log if symptom not found
+            if (symptom == null) 
+            {
+                _logger.LogInformation("Symptom with ID {SymptomId} not found for deletion.", id);
+                return false;
+            }
+            symptom.PatientId = patientId;
+            _context.Symptom.Remove(symptom);
+
             return await _symptomRepository.DeleteSymptom(id);
         }
         #endregion 

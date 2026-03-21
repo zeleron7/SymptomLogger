@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Azure;
 using Microsoft.AspNetCore.Authorization;
@@ -10,9 +11,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SymptomLogger.src.Data;
 using SymptomLogger.src.DTO;
+using SymptomLogger.src.Entity;
 using SymptomLogger.src.Models;
 using SymptomLogger.src.Repositories.Interfaces;
 using SymptomLogger.src.Services;
+using SymptomLogger.src.Utils;
 
 namespace SymptomLogger.src.Controllers
 {
@@ -77,7 +80,7 @@ namespace SymptomLogger.src.Controllers
         // Patch: api/Symptoms/5 
         // Try this endpoint with postman or change JSON format [{"op": "replace", "path": "/description", "value": "Updated description"}]
         #region Update symptom
-
+        [Authorize]
         [HttpPatch("{id}")] 
         public async Task<IActionResult> PatchSymptom(int id, [FromBody] JsonPatchDocument<UpdateSymptomDTO> patchDoc)
         {
@@ -89,7 +92,10 @@ namespace SymptomLogger.src.Controllers
                     return BadRequest("Patch document cannot be null.");
                 }
 
-                var updatedSymptom = await _symptomService.UpdateSymptomAsync(id, patchDoc);
+                // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
+                var patientId = RetrievePatientId.GetPatientId(User);
+
+                var updatedSymptom = await _symptomService.UpdateSymptomAsync(id, patchDoc, patientId);
                 _logger.LogInformation("Symptom with ID {SymptomId} updated successfully.", id);
 
                 return Ok(updatedSymptom);
@@ -124,7 +130,10 @@ namespace SymptomLogger.src.Controllers
 
             try
             {
-                var createdSymptom = await _symptomService.AddSymptomAsync(dto, User);
+                // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
+                var patientId = RetrievePatientId.GetPatientId(User);
+
+                var createdSymptom = await _symptomService.AddSymptomAsync(dto, patientId);
                 return Ok(createdSymptom);
             }
 
@@ -139,12 +148,15 @@ namespace SymptomLogger.src.Controllers
         // DELETE: api/Symptoms/5
         #region Delete symptom
 
-        [HttpDelete("{id}")] 
+        [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteSymptom(int id)
         {
             try
             {
-                var success = await _symptomService.DeleteSymptomAsync(id);
+                var patientId = RetrievePatientId.GetPatientId(User);
+
+                var success = await _symptomService.DeleteSymptomAsync(id, patientId);
                 _logger.LogInformation("Attempting to delete symptom with ID {SymptomId}. Success: {Success}.", id, success);
 
                 if (!success)

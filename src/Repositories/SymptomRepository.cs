@@ -29,8 +29,10 @@ namespace SymptomLogger.src.Repositories
         }
 
         // Add new symptom
-        public async Task<Symptom> AddSymptom(Symptom symptom)
+        public async Task<Symptom> AddSymptom(Symptom symptom, string patientId)
         {
+            symptom.PatientId = patientId; 
+
             await _context.Symptom.AddAsync(symptom);
             await _context.SaveChangesAsync();
 
@@ -38,8 +40,10 @@ namespace SymptomLogger.src.Repositories
         }
 
         // Update existing symptom
-        public async Task<Symptom> UpdateSymptom(Symptom symptom)
+        public async Task<Symptom> UpdateSymptom(Symptom symptom, string patientId)
         {
+            symptom.PatientId = patientId;
+
             _context.Symptom.Update(symptom);
             await _context.SaveChangesAsync();
 
