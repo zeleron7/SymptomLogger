@@ -11,6 +11,7 @@ namespace SymptomLogger.src.AutoMapper
             // input > entity
             CreateMap<CreateSymptomDTO, Symptom>();
             CreateMap<UpdateSymptomDTO, Symptom>();
+            CreateMap<Symptom, UpdateSymptomDTO>();
 
             // entity > response
             CreateMap<Symptom, ResponseSymptomDTO>();

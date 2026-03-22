@@ -79,7 +79,7 @@ namespace SymptomLogger.src.Services
         #region UpdateSymptomAsync
         public async Task<ResponseSymptomDTO> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc, string patientId)
         {
-            var updatedSymptom = await _context.Symptom.FindAsync(id);
+            var updatedSymptom = await _symptomRepository.GetSymptomById(id);
 
             if (updatedSymptom == null)
             {
@@ -87,23 +87,12 @@ namespace SymptomLogger.src.Services
                 throw new KeyNotFoundException($"Symptom with ID {id} not found.");
             }
 
-            var dto = new UpdateSymptomDTO
-            {
-                Type = updatedSymptom.Type,
-                Description = updatedSymptom.Description,
-                Name = updatedSymptom.Name,
-                Severity = updatedSymptom.Severity
-            };
+            // map updated symptom to dto
+            var dto = _mapper.Map<UpdateSymptomDTO>(updatedSymptom);
 
+            // apply the patch document to dto > map the patched dto back to the symptom entity > set the patientId to ensure the symptom remains associated with the correct patient
             patchDoc.ApplyTo(dto);
-
-            // Only update properties that are not null in the DTO
-            updatedSymptom.Type = dto.Type ?? updatedSymptom.Type;
-            updatedSymptom.Description = dto.Description ?? updatedSymptom.Description;
-            updatedSymptom.Name = dto.Name ?? updatedSymptom.Name;
-            updatedSymptom.Severity = dto.Severity ?? updatedSymptom.Severity;
-
-            // set the patientId passed from the controller to ensure the symptom is associated with the correct patient
+            _mapper.Map(dto, updatedSymptom);
             updatedSymptom.PatientId = patientId;
 
             var UpdatedSymptom = await _symptomRepository.UpdateSymptom(updatedSymptom, patientId);

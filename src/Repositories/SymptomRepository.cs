@@ -54,6 +54,7 @@ namespace SymptomLogger.src.Repositories
         public async Task<bool> DeleteSymptom(int id)
         {
             var symptom = await _context.Symptom.FindAsync(id);
+
             _context.Symptom.Remove(symptom);
             await _context.SaveChangesAsync();
 

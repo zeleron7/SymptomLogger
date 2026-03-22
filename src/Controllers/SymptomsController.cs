@@ -147,7 +147,6 @@ namespace SymptomLogger.src.Controllers
 
         // DELETE: api/Symptoms/5
         #region Delete symptom
-
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteSymptom(int id)

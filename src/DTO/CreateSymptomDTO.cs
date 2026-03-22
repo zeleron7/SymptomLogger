@@ -5,6 +5,7 @@ namespace SymptomLogger.src.DTO
     public class CreateSymptomDTO
     {
         public string Type { get; set; }
+
         [Required(ErrorMessage = "The Description is required.")]
         [StringLength(100, ErrorMessage = "The description must be less than 100 characters.")]
         public string Description { get; set; }

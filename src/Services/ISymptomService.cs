@@ -14,6 +14,5 @@ namespace SymptomLogger.src.Services
         Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto, string patientId);
         Task<ResponseSymptomDTO> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc, string patientId);
         Task<bool> DeleteSymptomAsync(int id, string patientId);
-
     }
 }
