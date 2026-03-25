@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,38 +19,42 @@ namespace SymptomLogger.src.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        private readonly IMapper _mapper;
+        private readonly ILogger<AuthController> _logger;
         private readonly UserManager<Patient> _userManager;
         private readonly SignInManager<Patient> _signInManager;
         private readonly IConfiguration _configuration;
         public AuthController(
             UserManager<Patient> userManager,
             SignInManager<Patient> signInManager,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILogger<AuthController> logger,
+            IMapper mapper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _logger = logger;
+            _mapper = mapper;
         }
 
         // POST: api/Auth/register
         #region Register
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterPatientDTO model)
+        public async Task<IActionResult> Register(CreatePatientDTO register)
         {
-            var patient = new Patient
-            {
-                UserName = model.UserName,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName
-            };
-            var result = await _userManager.CreateAsync(patient, model.Password);
+            // map DTO to entity
+            var patient = _mapper.Map<Patient>(register);
+
+            var result = await _userManager.CreateAsync(patient, register.Password);
             if (result.Succeeded)
             {
                 // add roles if needed
 
+                _logger.LogInformation("New patient registered with email {Email}.", register.Email);
                 return Ok(new { message = "Registration successful" });
             }
+            _logger.LogWarning("Registration failed for email {Email}.", register.Email);
             return BadRequest(result.Errors);
         }
         #endregion
@@ -62,12 +67,14 @@ namespace SymptomLogger.src.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
+                _logger.LogWarning("Login attempt failed for email {Email}. User not found.", model.Email);
                 return BadRequest("Invalid credentials");
             }
             var result = await _signInManager.CheckPasswordSignInAsync(
                 user, model.Password, lockoutOnFailure: false);
             if (result.Succeeded)
             {
+                _logger.LogInformation("Patient with email {Email} logged in successfully.", model.Email);
                 var token = GenerateJwtToken(user);
                 return Ok(new { token });
             }

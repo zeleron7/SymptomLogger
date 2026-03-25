@@ -12,8 +12,8 @@ using SymptomLogger.src.Data;
 namespace SymptomLogger.Migrations
 {
     [DbContext(typeof(SymptomLoggerContext))]
-    [Migration("20260320164817_mssql.local_migration_349")]
-    partial class mssqllocal_migration_349
+    [Migration("20260325144844_mssql.local_migration_785")]
+    partial class mssqllocal_migration_785
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -174,7 +174,6 @@ namespace SymptomLogger.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 

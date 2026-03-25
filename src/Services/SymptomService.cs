@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using SymptomLogger.src.Data;
 using SymptomLogger.src.DTO;
-using SymptomLogger.src.Models;
+using SymptomLogger.src.Entity;
 using SymptomLogger.src.Repositories.Interfaces;
 using System.Net;
 using System.Security.Claims;

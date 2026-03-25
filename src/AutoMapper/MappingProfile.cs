@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using SymptomLogger.src.DTO;
-using SymptomLogger.src.Models;
+using SymptomLogger.src.Entity;
 
 namespace SymptomLogger.src.AutoMapper
 {
@@ -8,14 +8,17 @@ namespace SymptomLogger.src.AutoMapper
     {
         public MappingProfile()
         {
-            // input > entity
+            // Patient
+            CreateMap<CreatePatientDTO, Patient>();
+             
+            // Symptom
+            #region Symptom
             CreateMap<CreateSymptomDTO, Symptom>();
             CreateMap<UpdateSymptomDTO, Symptom>();
-            CreateMap<Symptom, UpdateSymptomDTO>();
+            CreateMap<Symptom, UpdateSymptomDTO>(); // for patching, to convert entity back to DTO
 
-            // entity > response
-            CreateMap<Symptom, ResponseSymptomDTO>();
-
+            CreateMap<Symptom, ResponseSymptomDTO>(); 
+            #endregion 
         }
     }
 }

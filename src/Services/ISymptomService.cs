@@ -1,7 +1,7 @@
 ﻿using Azure;
 using Microsoft.AspNetCore.JsonPatch;
 using SymptomLogger.src.DTO;
-using SymptomLogger.src.Models;
+using SymptomLogger.src.Entity;
 using System.Security.Claims;
 
 namespace SymptomLogger.src.Services

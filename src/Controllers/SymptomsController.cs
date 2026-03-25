@@ -12,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using SymptomLogger.src.Data;
 using SymptomLogger.src.DTO;
 using SymptomLogger.src.Entity;
-using SymptomLogger.src.Models;
 using SymptomLogger.src.Repositories.Interfaces;
 using SymptomLogger.src.Services;
 using SymptomLogger.src.Utils;
@@ -36,19 +35,18 @@ namespace SymptomLogger.src.Controllers
         #region Get all symptoms
         [Authorize]
         [HttpGet("GetAll")] 
-        public async Task<ActionResult<List<Symptom>>> GetAllSymptoms()
+        public async Task<ActionResult<IEnumerable<ResponseSymptomDTO>>> GetAllSymptoms()
         {
-            try
+            _logger.LogInformation("Retrieving all symptoms.");
+            var symptoms = await _symptomService.GetSymptomsAsync();
+            if (!symptoms.Any())
             {
-                _logger.LogInformation("Retrieving all symptoms.");
-                var symptoms = await _symptomService.GetSymptomsAsync();
-                return Ok(symptoms);
+                _logger.LogWarning("No symptoms found.");
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving symptoms.");
-                return StatusCode(500, "An error occurred while retrieving symptoms.");
-            }
+
+            return Ok(symptoms);
+
         }
         #endregion
 
@@ -56,24 +54,17 @@ namespace SymptomLogger.src.Controllers
         #region Get symptom by ID
         [Authorize]
         [HttpGet("{id}")] 
-        public async Task<ActionResult<Symptom>> GetSymptom(int id)
+        public async Task<ActionResult<ResponseSymptomDTO>> GetSymptom(int id)
         {
-            try
+            _logger.LogInformation("Retrieving symptom with ID {SymptomId}.", id);
+            var symptom = await _symptomService.GetSymptomByIdAsync(id);
+            if (symptom == null)
             {
-                _logger.LogInformation("Retrieving symptom with ID {SymptomId}.", id);
-                var symptom = await _symptomService.GetSymptomByIdAsync(id);
-                if (symptom == null)
-                {
-                    _logger.LogWarning("Symptom with ID {SymptomId} not found.", id);
-                    return NotFound();
-                }
-                return Ok(symptom);
+                _logger.LogWarning("Symptom with ID {SymptomId} not found.", id);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving symptom with ID {SymptomId}.", id);
-                return StatusCode(500, "An error occurred while retrieving the symptom.");
-            }
+            _logger.LogInformation("Symptom with ID {SymptomId} retrieved successfully.", id);
+            return Ok(symptom);
         }
         #endregion
 

@@ -43,12 +43,11 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<ISymptomRepository, SymptomRepository>();
 builder.Services.AddScoped<ISymptomService, SymptomService>();
 
-// JWT Authentication 
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
-    // Add JWT authentication to Swagger
+    // JWT Auth
     #region JWT Auth
     options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
     {
@@ -109,6 +108,9 @@ builder.Services.AddAuthentication(options =>
 var app = builder.Build();
 
 app.UseSwagger();
+
+// Global exception handling middleware
+app.UseMiddleware<SymptomLogger.src.Middleware.ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

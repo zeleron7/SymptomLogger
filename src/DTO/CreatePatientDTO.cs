@@ -1,6 +1,6 @@
 ﻿namespace SymptomLogger.src.DTO
 {
-    public class RegisterPatientDTO
+    public class CreatePatientDTO
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
