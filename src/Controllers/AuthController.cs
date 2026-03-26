@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using SymptomLogger.src.DTO;
+using SymptomLogger.src.DTO.Patient;
 using SymptomLogger.src.Entity;
 
 namespace SymptomLogger.src.Controllers

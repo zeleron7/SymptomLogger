@@ -3,7 +3,7 @@ using Azure;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using SymptomLogger.src.Data;
-using SymptomLogger.src.DTO;
+using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.Entity;
 using SymptomLogger.src.Repositories.Interfaces;
 using System.Net;
@@ -106,10 +106,9 @@ namespace SymptomLogger.src.Services
         {
             var symptom = await _symptomRepository.GetSymptomById(id);
 
-            // null check to prevent null reference exception and log if symptom not found
+            // null check to prevent null reference exception
             if (symptom == null) 
             {
-                _logger.LogInformation("Symptom with ID {SymptomId} not found for deletion.", id);
                 return false;
             }
             symptom.PatientId = patientId;

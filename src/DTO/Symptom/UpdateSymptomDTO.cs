@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SymptomLogger.src.DTO
+namespace SymptomLogger.src.DTO.Symptom
 {
     public class UpdateSymptomDTO
     {

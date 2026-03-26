@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using SymptomLogger.src.DTO;
+using SymptomLogger.src.DTO.Patient;
+using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.Entity;
 
 namespace SymptomLogger.src.AutoMapper

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SymptomLogger.src.Data;
 using SymptomLogger.src.DTO;
+using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.Entity;
 using SymptomLogger.src.Repositories.Interfaces;
 using SymptomLogger.src.Services;
@@ -44,6 +45,7 @@ namespace SymptomLogger.src.Controllers
                 _logger.LogWarning("No symptoms found.");
                 return NotFound();
             }
+            _logger.LogInformation("Symptoms retrieved successfully. Count: {SymptomCount}.", symptoms.Count());
 
             return Ok(symptoms);
 
@@ -75,27 +77,22 @@ namespace SymptomLogger.src.Controllers
         [HttpPatch("{id}")] 
         public async Task<IActionResult> PatchSymptom(int id, [FromBody] JsonPatchDocument<UpdateSymptomDTO> patchDoc)
         {
-            try
+            _logger.LogInformation("Updating symptom with ID {SymptomId}.", id);
+
+            if (patchDoc == null)
             {
-                if (patchDoc == null)
-                {
-                    _logger.LogWarning("Patch document is null for symptom with ID {SymptomId}.", id);
-                    return BadRequest("Patch document cannot be null.");
-                }
-
-                // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
-                var patientId = RetrievePatientId.GetPatientId(User);
-
-                var updatedSymptom = await _symptomService.UpdateSymptomAsync(id, patchDoc, patientId);
-                _logger.LogInformation("Symptom with ID {SymptomId} updated successfully.", id);
-
-                return Ok(updatedSymptom);
+                _logger.LogWarning("Patch document is null for symptom with ID {SymptomId}.", id);
+                return BadRequest("Patch document cannot be null.");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while updating symptom with ID {SymptomId}.", id);
-                return StatusCode(500, "An error occurred while updating the symptom.");
-            }
+
+            // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
+            var patientId = RetrievePatientId.GetPatientId(User);
+
+            var updatedSymptom = await _symptomService.UpdateSymptomAsync(id, patchDoc, patientId);
+            _logger.LogInformation("Symptom with ID {SymptomId} updated successfully.", id);
+
+            return Ok(updatedSymptom);
+
         }
         #endregion
 
@@ -105,6 +102,8 @@ namespace SymptomLogger.src.Controllers
         [HttpPost] 
         public async Task<ActionResult<Symptom>> PostSymptom(CreateSymptomDTO dto)
         {
+            _logger.LogInformation("Creating new symptom");
+
             // Check if Description is either empty or over 100 characters
             if (!ModelState.IsValid)
             {
@@ -118,21 +117,13 @@ namespace SymptomLogger.src.Controllers
                 _logger.LogWarning("Default value for Description field detected. Please provide a valid description.");
                 return BadRequest("Please describe your symptoms.");
             }
+            
+            // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
+            var patientId = RetrievePatientId.GetPatientId(User);
+            var createdSymptom = await _symptomService.AddSymptomAsync(dto, patientId);
+             _logger.LogInformation("Symptom created successfully with Description {Description}.", createdSymptom.Description);
 
-            try
-            {
-                // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
-                var patientId = RetrievePatientId.GetPatientId(User);
-
-                var createdSymptom = await _symptomService.AddSymptomAsync(dto, patientId);
-                return Ok(createdSymptom);
-            }
-
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while creating a new symptom.");
-                return StatusCode(500, "An error occurred while creating the symptom.");
-            }
+            return Ok(createdSymptom);
         }
         #endregion
 
@@ -142,25 +133,18 @@ namespace SymptomLogger.src.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteSymptom(int id)
         {
-            try
-            {
-                var patientId = RetrievePatientId.GetPatientId(User);
+            _logger.LogInformation("Deleting symptom with ID {SymptomId}.", id);
 
-                var success = await _symptomService.DeleteSymptomAsync(id, patientId);
-                _logger.LogInformation("Attempting to delete symptom with ID {SymptomId}. Success: {Success}.", id, success);
+            var patientId = RetrievePatientId.GetPatientId(User);
+            var success = await _symptomService.DeleteSymptomAsync(id, patientId);
 
-                if (!success)
-                {
-                    _logger.LogWarning("Symptom with ID {SymptomId} not found for deletion.", id);
-                    return NotFound();
-                }
-                return NoContent();
-            }
-            catch (Exception ex)
+            if (!success)
             {
-                _logger.LogError(ex, "An error occurred while deleting symptom with ID {SymptomId}.", id);
-                return StatusCode(500, "An error occurred while deleting the symptom.");
+                _logger.LogWarning("Symptom with ID {SymptomId} not found for deletion.", id);
+                return NotFound();
             }
+            _logger.LogInformation("Symptom with ID {SymptomId} deleted successfully.", id);
+            return Ok(new { message = "Symptom deleted successfully" });
         }
         #endregion 
     }

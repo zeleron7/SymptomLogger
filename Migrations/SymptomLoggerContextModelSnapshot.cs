@@ -231,7 +231,7 @@ namespace SymptomLogger.Migrations
                     b.ToTable("Patients", (string)null);
                 });
 
-            modelBuilder.Entity("SymptomLogger.src.Models.Symptom", b =>
+            modelBuilder.Entity("SymptomLogger.src.Entity.Symptom", b =>
                 {
                     b.Property<int>("SymptomId")
                         .ValueGeneratedOnAdd()
@@ -319,7 +319,7 @@ namespace SymptomLogger.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SymptomLogger.src.Models.Symptom", b =>
+            modelBuilder.Entity("SymptomLogger.src.Entity.Symptom", b =>
                 {
                     b.HasOne("SymptomLogger.src.Entity.Patient", "Patient")
                         .WithMany("Symptoms")

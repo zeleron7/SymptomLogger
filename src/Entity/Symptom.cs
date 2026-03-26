@@ -17,7 +17,6 @@ namespace SymptomLogger.src.Entity
 
         public Patient Patient { get; set; } // Navigation property to Patient
 
-        [ForeignKey("Patient")]
         public string PatientId { get; set; } // Foreign key
 
     }

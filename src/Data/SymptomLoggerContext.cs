@@ -19,9 +19,11 @@ namespace SymptomLogger.src.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            // Call the base method to ensure Identity configurations are applied
             base.OnModelCreating(builder);
 
             // Custom configurations for Identity tables
+            #region Identity table configurations
             builder.Entity<Patient>(entity =>
             {
                 entity.ToTable(name: "Patients");
@@ -30,6 +32,14 @@ namespace SymptomLogger.src.Data
             {
                 entity.ToTable(name: "Roles");
             });
+            #endregion 
+
+            // Symptom
+            builder.Entity<Symptom>()
+                .HasOne(s => s.Patient)
+                .WithMany(p => p.Symptoms)
+                .HasForeignKey(s => s.PatientId);
+
         }
 
         public DbSet<Symptom> Symptom { get; set; }
