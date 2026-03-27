@@ -18,19 +18,23 @@ namespace SymptomLogger.src.Controllers
         }
 
         // POST api/SeedDatabase/seed
+        #region SeedDatabase
         [HttpPost("seed")]
         public async Task<IActionResult> SeedDatabase()
         {
             await _seedDatabaseService.SeedDatabase();
             return Ok(new { message = "Database seeded successfully" });
         }
+        #endregion
 
         // DELETE api/SeedDatabase/clear
+        #region ClearDatabase
         [HttpDelete("clear")]
-        public async Task<IActionResult> Delete()
+        public async Task<IActionResult> ClearDatabase()
         {
             await _seedDatabaseService.ClearDatabase();
             return Ok(new { message = "Database cleared successfully" });
         }
+        #endregion 
     }
 }

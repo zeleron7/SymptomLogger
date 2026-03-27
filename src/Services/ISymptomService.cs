@@ -10,7 +10,7 @@ namespace SymptomLogger.src.Services
     {
         // Symptoms
         Task<IEnumerable<ResponseSymptomDTO>> GetSymptomsAsync();
-        Task<ResponseSymptomDTO> GetSymptomByIdAsync(int id);
+        Task<ResponseSymptomDTO> GetSymptomByIdAsync(int id, string patientId);
         Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto, string patientId);
         Task<ResponseSymptomDTO> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc, string patientId);
         Task<bool> DeleteSymptomAsync(int id, string patientId);

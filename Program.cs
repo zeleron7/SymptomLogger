@@ -11,38 +11,53 @@ using SymptomLogger.src.Entity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FluentValidation;
+using SymptomLogger.src.Validators;
+using FluentValidation.AspNetCore;
+using SymptomLogger.src.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SymptomLoggerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SymptomLoggerContext") ?? throw new InvalidOperationException("Connection string 'SymptomLoggerContext' not found.")));
 
 // Serilog configuration
+#region Serilog configuration
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .CreateLogger();
-
 builder.Host.UseSerilog();
-
-// Add services to the container.
+#endregion 
 
 // NewtonsoftJson for JSON Patch
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
-
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 builder.Services.AddEndpointsApiExplorer();
 
 // AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+// Dependency Injection 
+#region DI
 // DI Symptoms
 builder.Services.AddScoped<ISymptomRepository, SymptomRepository>();
 builder.Services.AddScoped<ISymptomService, SymptomService>();
 
 // DI Seeder
 builder.Services.AddScoped<ISeedDatabaseService, SeedDatabaseService>();
+#endregion 
+
+// Register FluentValidation validators
+builder.Services.AddValidatorsFromAssemblyContaining<CreatePatientDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateSymptomDTOValidator>();
+
+// Enable automatic validation of DTOs using FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+
+// Global exception handling
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -110,8 +125,7 @@ var app = builder.Build();
 
 app.UseSwagger();
 
-// Global exception handling middleware
-app.UseMiddleware<SymptomLogger.src.Middleware.ExceptionHandlingMiddleware>();
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

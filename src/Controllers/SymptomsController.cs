@@ -59,7 +59,9 @@ namespace SymptomLogger.src.Controllers
         public async Task<ActionResult<ResponseSymptomDTO>> GetSymptom(int id)
         {
             _logger.LogInformation("Retrieving symptom with ID {SymptomId}.", id);
-            var symptom = await _symptomService.GetSymptomByIdAsync(id);
+            var patientId = RetrievePatientId.GetPatientId(User);
+
+            var symptom = await _symptomService.GetSymptomByIdAsync(id, patientId);
             if (symptom == null)
             {
                 _logger.LogWarning("Symptom with ID {SymptomId} not found.", id);
