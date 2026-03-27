@@ -1,0 +1,73 @@
+﻿using Microsoft.EntityFrameworkCore;
+using SymptomLogger.src.Data;
+using SymptomLogger.src.Entity;
+using SymptomLogger.src.Repositories.Interfaces;
+
+
+namespace SymptomLogger.src.Services
+{
+    public class SeedDatabaseService : ISeedDatabaseService
+    {
+        private readonly ILogger<SeedDatabaseService> _logger;
+        private readonly SymptomLoggerContext _context;
+        const string seedSource = "./symptoms.json";
+        public SeedDatabaseService( ILogger<SeedDatabaseService> logger, SymptomLoggerContext context)
+        {
+            _context = context;
+            _logger = logger;
+        }
+        // Seed database
+        #region SeedDatabase
+        public async Task SeedDatabase()
+        {
+            using (var streamReader = new StreamReader(seedSource))
+            {
+                var jsonData = await streamReader.ReadToEndAsync();
+                if (string.IsNullOrEmpty(jsonData))
+                {
+                    _logger.LogError("JSON data is empty or null.");
+                    throw new Exception("JSON data is empty or null.");
+                }
+                var symptoms = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Symptom>>(jsonData);
+                if (symptoms == null)
+                {
+                    _logger.LogError("Failed to deserialize symptoms from JSON.");
+                    throw new Exception("Failed to deserialize symptoms from JSON.");
+                }
+                // get first patient to assign symptoms to (FOR TESTING PURPOSE)
+                // ASSIGN TO ADMIN USER LATER
+                var patient = _context.Patient.FirstOrDefault();
+
+                // assign patient Id to each symptom
+                foreach (var symptom in symptoms)
+                {
+                    symptom.PatientId = patient.Id;
+                }
+
+                await _context.AddRangeAsync(symptoms);
+                _logger.LogInformation("Seeded symptoms into database.");
+                await _context.SaveChangesAsync();
+            }
+        }
+        #endregion 
+
+        //Clear database
+        #region ClearDatabase
+        public async Task ClearDatabase()
+        {
+            var symptoms = await _context.Symptom.ToListAsync();
+
+            if (symptoms.Count > 0)
+            {
+                _context.Symptom.RemoveRange(symptoms);
+                _logger.LogInformation("Cleared symptoms from database.");
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                _logger.LogWarning("No symptoms found to clear from database.");
+            } 
+        }
+        #endregion 
+    }
+}

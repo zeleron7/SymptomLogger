@@ -6,8 +6,6 @@ using SymptomLogger.src.Repositories.Interfaces;
 using SymptomLogger.src.Services;
 using Serilog;
 using SymptomLogger.src.Repositories;
-using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using SymptomLogger.src.Entity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -42,6 +40,9 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // DI Symptoms
 builder.Services.AddScoped<ISymptomRepository, SymptomRepository>();
 builder.Services.AddScoped<ISymptomService, SymptomService>();
+
+// DI Seeder
+builder.Services.AddScoped<ISeedDatabaseService, SeedDatabaseService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
