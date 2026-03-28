@@ -17,9 +17,9 @@ namespace SymptomLogger.src.Repositories
         }
 
         // Get all symptoms
-        public async Task<IEnumerable<Symptom>> GetSymptoms()
+        public IQueryable<Symptom> GetSymptoms()
         {
-            return await _context.Symptom.ToListAsync();
+            return _context.Symptom.AsNoTracking();
         }
 
         // Get symptom by ID

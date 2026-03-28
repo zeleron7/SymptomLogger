@@ -8,6 +8,7 @@ using SymptomLogger.src.Entity;
 using SymptomLogger.src.Repositories.Interfaces;
 using System.Net;
 using System.Security.Claims;
+using AutoMapper.QueryableExtensions;
 
 namespace SymptomLogger.src.Services
 {
@@ -29,10 +30,10 @@ namespace SymptomLogger.src.Services
 
         // Get all symptoms
         #region GetSymptomsAsync
-        public async Task<IEnumerable<ResponseSymptomDTO>> GetSymptomsAsync()
+        public IQueryable<ResponseSymptomDTO> GetSymptoms()
         {
-            var Symptoms = await _symptomRepository.GetSymptoms();
-            return _mapper.Map<IEnumerable<ResponseSymptomDTO>>(Symptoms);
+            return _symptomRepository.GetSymptoms()
+                .ProjectTo<ResponseSymptomDTO>(_mapper.ConfigurationProvider);
         }
         #endregion
 

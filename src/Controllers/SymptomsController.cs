@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Azure;
 using Microsoft.AspNetCore.Authorization;
@@ -36,10 +37,14 @@ namespace SymptomLogger.src.Controllers
         #region Get all symptoms
         [Authorize]
         [HttpGet("GetAll")] 
-        public async Task<ActionResult<IEnumerable<ResponseSymptomDTO>>> GetAllSymptoms()
+        public async Task<ActionResult<IQueryable<ResponseSymptomDTO>>> GetAllSymptoms([FromQuery] PageParameters pageParameters)
         {
             _logger.LogInformation("Retrieving all symptoms.");
-            var symptoms = await _symptomService.GetSymptomsAsync();
+            var symptoms = _symptomService.GetSymptoms();
+
+            // Implement pagination using the PagedList utility class
+            var PagedSymptoms = await PagedList<ResponseSymptomDTO>.CreateAsync(symptoms, pageParameters.PageNumber, pageParameters.PageSize);
+
             if (!symptoms.Any())
             {
                 _logger.LogWarning("No symptoms found.");
@@ -47,7 +52,7 @@ namespace SymptomLogger.src.Controllers
             }
             _logger.LogInformation("Symptoms retrieved successfully. Count: {SymptomCount}.", symptoms.Count());
 
-            return Ok(symptoms);
+            return Ok(PagedSymptoms);
 
         }
         #endregion
