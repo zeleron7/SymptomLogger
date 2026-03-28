@@ -15,15 +15,13 @@ namespace SymptomLogger.src.Services
     public class SymptomService : ISymptomService
     {
         private readonly ISymptomRepository _symptomRepository;
-        private readonly SymptomLoggerContext _context;
         private readonly ILogger<SymptomService> _logger;
         private readonly IMapper _mapper;
 
-        public SymptomService(ISymptomRepository symptomRepository, SymptomLoggerContext context, ILogger<SymptomService> logger,
+        public SymptomService(ISymptomRepository symptomRepository, ILogger<SymptomService> logger,
             IMapper mapper)
         {
             _symptomRepository = symptomRepository;
-            _context = context;
             _logger = logger;
             _mapper = mapper;
         }
@@ -131,8 +129,7 @@ namespace SymptomLogger.src.Services
                 return false;
             }
             symptom.PatientId = patientId;
-            _context.Symptom.Remove(symptom);
-
+            
             return await _symptomRepository.DeleteSymptom(id);
         }
         #endregion 
