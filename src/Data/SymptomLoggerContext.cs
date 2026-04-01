@@ -41,8 +41,8 @@ namespace SymptomLogger.src.Data
                 .HasForeignKey(s => s.PatientId);
 
         }
-
-        public DbSet<Symptom> Symptom { get; set; }
         public DbSet<Patient> Patient { get; set; }
+        public DbSet<SymptomLog> SymptomLog { get; set; }
+        public DbSet<Symptom> Symptom { get; set; }
     }
 }
