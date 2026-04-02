@@ -8,13 +8,11 @@ namespace SymptomLogger.src.Entity
         [Key]
         public int SymptomId { get; set; } // Primary key
 
-        // Type of symptom (e.g., headache, fatigue, etc.)
-        public string Type { get; set; } // change to category?
+        public string Category { get; set; } // Type
         public string Description { get; set; }
         public string Name { get; set; }
         public DateTime Date { get; set; } = DateTime.Now;
-        public int Severity { get; set; } // remove?
-        // add bool isActive?
+        // add bool isActive for soft delete?
 
         public Patient Patient { get; set; } // Navigation property to Patient
 

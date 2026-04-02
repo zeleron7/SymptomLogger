@@ -13,38 +13,44 @@ namespace SymptomLogger.src.Repositories
             _context = context;
         }
 
+        // Get all symptom logs
         public IQueryable<SymptomLog> GetSymptomLogs()
         {
-            //return _context.SymptomLog.AsNoTracking();
-            return _context.SymptomLog.Include(s => s.Symptom).AsNoTracking();
+            return _context.SymptomLog.AsNoTracking();
         }
+        // Get symptom log by ID
         public async Task<SymptomLog> GetSymptomLogById(int id)
         {
             return await _context.SymptomLog.FindAsync(id);
         }
-        public async Task<SymptomLog> AddSymptomLog(SymptomLog symptomLog)
+        // Add new symptom log
+        public async Task<SymptomLog> AddSymptomLog(SymptomLog symptomLog, string patientId)
         {
+            symptomLog.PatientId = patientId;
+
             await _context.SymptomLog.AddAsync(symptomLog);
             await _context.SaveChangesAsync();
 
             return symptomLog;
         }
-        public async Task<SymptomLog> UpdateSymptomLog(SymptomLog symptomLog)
+        // Update existing symptom log
+        public async Task<SymptomLog> UpdateSymptomLog(SymptomLog symptomLog, string patientId)
         {
+            symptomLog.PatientId = patientId;
+
             _context.SymptomLog.Update(symptomLog);
             await _context.SaveChangesAsync();
+
             return symptomLog;
         }
-
+        // Delete symptom log by ID
         public async Task<bool> DeleteSymptomLog(int id)
         {
             var symptomLog = await _context.SymptomLog.FindAsync(id);
-            if (symptomLog == null)
-            {
-                return false;
-            }
+
             _context.SymptomLog.Remove(symptomLog);
             await _context.SaveChangesAsync();
+
             return true;
         }
     }

@@ -107,7 +107,7 @@ namespace SymptomLogger.src.Controllers
         #region Create new symptom
         [Authorize]
         [HttpPost] 
-        public async Task<ActionResult<Symptom>> PostSymptom(CreateSymptomDTO dto)
+        public async Task<ActionResult<ResponseSymptomDTO>> PostSymptom(CreateSymptomDTO dto)
         {
             _logger.LogInformation("Creating new symptom");
 

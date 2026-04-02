@@ -27,7 +27,7 @@ namespace SymptomLogger.src.Services
         }
 
         // Get all symptoms
-        #region GetSymptomsAsync
+        #region GetSymptoms
         public IQueryable<ResponseSymptomDTO> GetSymptoms()
         {
             return _symptomRepository.GetSymptoms()

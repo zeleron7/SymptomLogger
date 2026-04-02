@@ -12,8 +12,8 @@ using SymptomLogger.src.Data;
 namespace SymptomLogger.Migrations
 {
     [DbContext(typeof(SymptomLoggerContext))]
-    [Migration("20260326154230_mssql.local_migration_104")]
-    partial class mssqllocal_migration_104
+    [Migration("20260402131614_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -242,6 +242,10 @@ namespace SymptomLogger.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SymptomId"));
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -257,18 +261,45 @@ namespace SymptomLogger.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Severity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("SymptomId");
 
                     b.HasIndex("PatientId");
 
                     b.ToTable("Symptom");
+                });
+
+            modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLog", b =>
+                {
+                    b.Property<int>("SymptomLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SymptomLogId"));
+
+                    b.Property<DateTime>("LoggedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PatientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SymptomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SymptomLogId");
+
+                    b.HasIndex("PatientId");
+
+                    b.HasIndex("SymptomId");
+
+                    b.ToTable("SymptomLog");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -333,8 +364,29 @@ namespace SymptomLogger.Migrations
                     b.Navigation("Patient");
                 });
 
+            modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLog", b =>
+                {
+                    b.HasOne("SymptomLogger.src.Entity.Patient", "Patient")
+                        .WithMany("SymptomLogs")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SymptomLogger.src.Entity.Symptom", "Symptom")
+                        .WithMany()
+                        .HasForeignKey("SymptomId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+
+                    b.Navigation("Symptom");
+                });
+
             modelBuilder.Entity("SymptomLogger.src.Entity.Patient", b =>
                 {
+                    b.Navigation("SymptomLogs");
+
                     b.Navigation("Symptoms");
                 });
 #pragma warning restore 612, 618

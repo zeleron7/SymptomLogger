@@ -5,7 +5,7 @@ namespace SymptomLogger.src.Validators
 {
     public class CreatePatientDTOValidator : AbstractValidator<CreatePatientDTO>
     {
-        // Validator for CreatePatientDTO
+        // Validator for CreatePatientDTO (request)
         public CreatePatientDTOValidator() 
         {
             RuleFor(x => x.FirstName)

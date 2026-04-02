@@ -44,6 +44,10 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<ISymptomRepository, SymptomRepository>();
 builder.Services.AddScoped<ISymptomService, SymptomService>();
 
+// DI SymptomLogs
+builder.Services.AddScoped<ISymptomLogRepository, SymptomLogRepository>();
+builder.Services.AddScoped<ISymptomLogService, SymptomLogService>();
+
 // DI Seeder
 builder.Services.AddScoped<ISeedDatabaseService, SeedDatabaseService>();
 #endregion 

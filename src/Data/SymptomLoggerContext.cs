@@ -34,12 +34,24 @@ namespace SymptomLogger.src.Data
             });
             #endregion 
 
-            // Symptom
+            // Symptom > Patient relationship
             builder.Entity<Symptom>()
                 .HasOne(s => s.Patient)
                 .WithMany(p => p.Symptoms)
                 .HasForeignKey(s => s.PatientId);
 
+            // SymptomLog > Patient relationship
+            builder.Entity<SymptomLog>()
+                .HasOne(sl => sl.Patient)
+                .WithMany(pl => pl.SymptomLogs)
+                .HasForeignKey(sl => sl.PatientId);
+
+            // SymptomLog > Symptom relationship
+            builder.Entity<SymptomLog>()
+                .HasOne(sl => sl.Symptom)
+                .WithMany() 
+                .HasForeignKey(sl => sl.SymptomId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes to avoid deleting symptoms when a log is deleted
         }
         public DbSet<Patient> Patient { get; set; }
         public DbSet<SymptomLog> SymptomLog { get; set; }

@@ -5,12 +5,12 @@ namespace SymptomLogger.src.Validators
 {
     public class CreateSymptomDTOValidator : AbstractValidator<CreateSymptomDTO>
     {
-        // Validator for CreateSymptomDTO
+        // Validator for CreateSymptomDTO (request)
         public CreateSymptomDTOValidator()
         {
-            RuleFor(x => x.Type)
+            RuleFor(x => x.Category)
                 .NotEqual("string", StringComparer.OrdinalIgnoreCase)
-                .NotEmpty().WithMessage("Symptom type is required.");
+                .NotEmpty().WithMessage("Symptom Category is required.");
 
             RuleFor(x => x.Description)
                 .NotEqual("string", StringComparer.OrdinalIgnoreCase)
@@ -20,8 +20,6 @@ namespace SymptomLogger.src.Validators
                 .NotEqual("string", StringComparer.OrdinalIgnoreCase)
                 .NotEmpty().WithMessage("Symptom name is required.");
 
-            RuleFor(x => x.Severity)
-                .InclusiveBetween(1, 10).WithMessage("Severity must be between 1 and 10.");
         }
     }
 }
