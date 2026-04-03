@@ -15,6 +15,7 @@ using FluentValidation;
 using SymptomLogger.src.Validators;
 using FluentValidation.AspNetCore;
 using SymptomLogger.src.Middleware;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SymptomLoggerContext>(options =>
@@ -32,6 +33,14 @@ builder.Host.UseSerilog();
 // NewtonsoftJson for JSON Patch
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
+
+// API versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;  // Header info for clients to see the supported versions
+});
 
 builder.Services.AddEndpointsApiExplorer();
 

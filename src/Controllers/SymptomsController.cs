@@ -20,8 +20,9 @@ using SymptomLogger.src.Utils;
 
 namespace SymptomLogger.src.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class SymptomsController : ControllerBase
     {
         private readonly ISymptomService _symptomService;
@@ -36,7 +37,7 @@ namespace SymptomLogger.src.Controllers
         // GET: api/Symptoms
         #region Get all symptoms
         [Authorize]
-        [HttpGet("GetAll")] 
+        [HttpGet] 
         public async Task<ActionResult<IQueryable<ResponseSymptomDTO>>> GetAllSymptoms([FromQuery] PageParameters pageParameters)
         {
             _logger.LogInformation("Retrieving all symptoms.");
@@ -78,11 +79,11 @@ namespace SymptomLogger.src.Controllers
         #endregion
 
         // Patch: api/Symptoms/5 
-        // Try this endpoint with postman or change JSON format [{"op": "replace", "path": "/description", "value": "Updated description"}]
+        // JSON format [{"op": "replace", "path": "/description", "value": "Updated description"}]
         #region Update symptom
         [Authorize]
         [HttpPatch("{id}")] 
-        public async Task<IActionResult> PatchSymptom(int id, [FromBody] JsonPatchDocument<UpdateSymptomDTO> patchDoc)
+        public async Task<IActionResult> UpdateSymptom(int id, [FromBody] JsonPatchDocument<UpdateSymptomDTO> patchDoc)
         {
             _logger.LogInformation("Updating symptom with ID {SymptomId}.", id);
 
@@ -107,7 +108,7 @@ namespace SymptomLogger.src.Controllers
         #region Create new symptom
         [Authorize]
         [HttpPost] 
-        public async Task<ActionResult<ResponseSymptomDTO>> PostSymptom(CreateSymptomDTO dto)
+        public async Task<ActionResult<ResponseSymptomDTO>> AddSymptom(CreateSymptomDTO dto)
         {
             _logger.LogInformation("Creating new symptom");
 

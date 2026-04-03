@@ -36,14 +36,14 @@ namespace SymptomLogger.src.Services
         #region GetSymptomLogByIdAsync
         public async Task<ResponseSymptomLogDTO> GetSymptomLogByIdAsync(int id, string patientId)
         {
-            var SymptomLogById = await _symptomLogRepository.GetSymptomLogById(id);
+            var symptomLogById = await _symptomLogRepository.GetSymptomLogById(id);
             // validate patient ID to ensure the symptom log being accessed belongs to the authenticated patient
-            if (SymptomLogById.PatientId != patientId)
+            if (symptomLogById.PatientId != patientId)
             {
                 _logger.LogWarning("User tried to retrieve symptom log ID {SymptomLogId}", id);
                 throw new UnauthorizedAccessException();
             }
-            return _mapper.Map<ResponseSymptomLogDTO>(SymptomLogById);
+            return _mapper.Map<ResponseSymptomLogDTO>(symptomLogById);
         }
         #endregion 
 
@@ -60,24 +60,16 @@ namespace SymptomLogger.src.Services
                 symptomLog.PatientId = patientId;
                 symptomLog.SymptomId = dto.SymptomId;
 
-
                 if (dto == null)
                 {
                     _logger.LogInformation("CreateSymptomLogDTO is null.");
                     throw new ArgumentNullException(nameof(dto), "Symptom log cannot be null.");
                 }
-
-                // map DTO to entity
-                //var symptomLog = _mapper.Map<SymptomLog>(dto);
-
-                // set the patientId passed from the controller to ensure the symptom is associated with the correct patient
-                //symptomLog.PatientId = patientId;
-
                 var CreatedSymptomLog = await _symptomLogRepository.AddSymptomLog(symptomLog, patientId);
                 return _mapper.Map<ResponseSymptomLogDTO>(CreatedSymptomLog);
             }
 
-             catch (Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while adding a new symptom log. DTO: {@CreateSymptomLogDTO}", dto);
                 throw new Exception("An error occurred while adding the symptom log.", ex);

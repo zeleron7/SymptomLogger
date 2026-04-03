@@ -5,8 +5,9 @@ using SymptomLogger.src.Services;
 
 namespace SymptomLogger.src.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class SeedDatabaseController : ControllerBase
     {
         private readonly ISeedDatabaseService _seedDatabaseService;

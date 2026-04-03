@@ -16,8 +16,9 @@ using Microsoft.AspNetCore.JsonPatch;
 
 namespace SymptomLogger.src.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class SymptomLogsController : ControllerBase
     {
         private readonly ISymptomLogService _symptomLogService;
@@ -31,14 +32,14 @@ namespace SymptomLogger.src.Controllers
 
         // GET: api/SymptomLogs
         #region Get all symptom logs
-        [HttpGet("Getall")]
-        public async Task<ActionResult<IQueryable<ResponseSymptomLogDTO>>> GetSymptomLogs([FromQuery] PageParameters pageParameters)
+        [HttpGet]
+        public async Task<ActionResult<IQueryable<ResponseSymptomLogDTO>>> GetAllSymptomLogs([FromQuery] PageParameters pageParameters)
         {
             _logger.LogInformation("Retrieving all symptoms logs.");
             var symptomLogs = _symptomLogService.GetSymptomLogs();
 
             // Implement pagination using the PagedList utility class
-            var PagedSymptomLogs = await PagedList<ResponseSymptomLogDTO>.CreateAsync(symptomLogs, pageParameters.PageNumber,
+            var pagedSymptomLogs = await PagedList<ResponseSymptomLogDTO>.CreateAsync(symptomLogs, pageParameters.PageNumber,
                 pageParameters.PageSize);
 
             if (!symptomLogs.Any())
@@ -47,8 +48,7 @@ namespace SymptomLogger.src.Controllers
                 return NotFound();
             }
             _logger.LogInformation("Symptom logs retrieved successfully. Count: {SymptomLogCount}.", symptomLogs.Count());
-
-            return Ok(PagedSymptomLogs);
+            return Ok(pagedSymptomLogs);
         }
         #endregion 
 
@@ -73,28 +73,26 @@ namespace SymptomLogger.src.Controllers
         #endregion
 
         // Patch: api/Symptoms/5 
-        // Try this endpoint with postman or change JSON format [{"op": "replace", "path": "/description", "value": "Updated description"}]
+        // JSON format [{"op": "replace", "path": "/notes", "value": "Updated notes"}]
         #region Update symptom
         [Authorize]
         [HttpPatch("{id}")]
-        public async Task<IActionResult> PatchSymptom(int id, [FromBody] JsonPatchDocument<UpdateSymptomLogDTO> patchDoc)
+        public async Task<IActionResult> UpdateSymptomLog(int id, [FromBody] JsonPatchDocument<UpdateSymptomLogDTO> patchDoc)
         {
-            _logger.LogInformation("Updating symptom with ID {SymptomId}.", id);
+            _logger.LogInformation("Updating symptom log with ID {SymptomId}.", id);
 
             if (patchDoc == null)
             {
-                _logger.LogWarning("Patch document is null for symptom with ID {SymptomId}.", id);
+                _logger.LogWarning("Patch document is null for symptom log with ID {SymptomId}.", id);
                 return BadRequest("Patch document cannot be null.");
             }
-
             // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
             var patientId = RetrievePatientId.GetPatientId(User);
 
-            var updatedSymptom = await _symptomLogService.UpdateSymptomLogAsync(id, patchDoc, patientId);
-            _logger.LogInformation("Symptom with ID {SymptomId} updated successfully.", id);
+            var updatedSymptomLog = await _symptomLogService.UpdateSymptomLogAsync(id, patchDoc, patientId);
+            _logger.LogInformation("Symptom log with ID {SymptomId} updated successfully.", id);
 
-            return Ok(updatedSymptom);
-
+            return Ok(updatedSymptomLog);
         }
         #endregion
 
@@ -102,28 +100,26 @@ namespace SymptomLogger.src.Controllers
         #region Create new symptom
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<ResponseSymptomLogDTO>> PostSymptomLog(CreateSymptomLogDTO dto)
+        public async Task<ActionResult<ResponseSymptomLogDTO>> AddSymptomLog(CreateSymptomLogDTO dto)
         {
-            _logger.LogInformation("Creating new symptom");
+            _logger.LogInformation("Creating new symptom log");
 
             // Check if Description is either empty or over 100 characters
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Invalid model state for creating symptom. Errors: {ModelErrors}.", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                _logger.LogWarning("Invalid model state for creating symptom log. Errors: {ModelErrors}.", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
                 return BadRequest(ModelState);
             }
-
             // validate default value 
             if (dto.Notes == "string")
             {
-                _logger.LogWarning("Default value for Description field detected. Please provide a valid description.");
+                _logger.LogWarning("Default value for note field detected. Please provide a valid note.");
                 return BadRequest("Please describe your symptoms.");
             }
-
             // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
             var patientId = RetrievePatientId.GetPatientId(User);
             var createdSymptom = await _symptomLogService.AddSymptomLogAsync(dto, patientId);
-            _logger.LogInformation("Symptom created successfully with Notes {Notes}.", createdSymptom.Notes);
+            _logger.LogInformation("Symptom log created successfully with Note {Notes}.", createdSymptom.Notes);
 
             return Ok(createdSymptom);
         }
@@ -133,20 +129,20 @@ namespace SymptomLogger.src.Controllers
         #region Delete symptom
         [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteSymptom(int id)
+        public async Task<IActionResult> DeleteSymptomLog(int id)
         {
-            _logger.LogInformation("Deleting symptom with ID {SymptomId}.", id);
+            _logger.LogInformation("Deleting symptom log with ID {SymptomId}.", id);
 
             var patientId = RetrievePatientId.GetPatientId(User);
             var success = await _symptomLogService.DeleteSymptomLogAsync(id, patientId);
 
             if (!success)
             {
-                _logger.LogWarning("Symptom with ID {SymptomId} not found for deletion.", id);
+                _logger.LogWarning("Symptom log with ID {SymptomId} not found for deletion.", id);
                 return NotFound();
             }
-            _logger.LogInformation("Symptom with ID {SymptomId} deleted successfully.", id);
-            return Ok(new { message = "Symptom deleted successfully" });
+            _logger.LogInformation("Symptom log with ID {SymptomId} deleted successfully.", id);
+            return Ok(new { message = "Symptom log deleted successfully" });
         }
         #endregion 
     }
