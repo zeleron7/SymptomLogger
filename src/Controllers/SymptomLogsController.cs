@@ -104,18 +104,6 @@ namespace SymptomLogger.src.Controllers
         {
             _logger.LogInformation("Creating new symptom log");
 
-            // Check if Description is either empty or over 100 characters
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Invalid model state for creating symptom log. Errors: {ModelErrors}.", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
-                return BadRequest(ModelState);
-            }
-            // validate default value 
-            if (dto.Notes == "string")
-            {
-                _logger.LogWarning("Default value for note field detected. Please provide a valid note.");
-                return BadRequest("Please describe your symptoms.");
-            }
             // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
             var patientId = RetrievePatientId.GetPatientId(User);
             var createdSymptom = await _symptomLogService.AddSymptomLogAsync(dto, patientId);

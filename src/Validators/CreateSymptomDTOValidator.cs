@@ -10,16 +10,15 @@ namespace SymptomLogger.src.Validators
         {
             RuleFor(x => x.Category)
                 .NotEqual("string", StringComparer.OrdinalIgnoreCase)
-                .NotEmpty().WithMessage("Symptom Category is required.");
+                .NotEmpty().WithMessage("Category is required.");
 
             RuleFor(x => x.Description)
                 .NotEqual("string", StringComparer.OrdinalIgnoreCase)
-                .NotEmpty().WithMessage("Symptom description is required.");
+                .NotEmpty().WithMessage("Description is required.");
 
             RuleFor(x => x.Name)
                 .NotEqual("string", StringComparer.OrdinalIgnoreCase)
-                .NotEmpty().WithMessage("Symptom name is required.");
-
+                .NotEmpty().WithMessage("Name is required.");
         }
     }
 }

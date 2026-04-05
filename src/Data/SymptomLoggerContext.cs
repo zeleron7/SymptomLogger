@@ -32,26 +32,42 @@ namespace SymptomLogger.src.Data
             {
                 entity.ToTable(name: "Roles");
             });
-            #endregion 
+            #endregion
+
+            // Custom configurations for application tables
+            #region Relationship configurations
 
             // Symptom > Patient relationship
             builder.Entity<Symptom>()
                 .HasOne(s => s.Patient)
-                .WithMany(p => p.Symptoms)
+                .WithMany(s => s.Symptoms)
                 .HasForeignKey(s => s.PatientId);
 
             // SymptomLog > Patient relationship
             builder.Entity<SymptomLog>()
                 .HasOne(sl => sl.Patient)
-                .WithMany(pl => pl.SymptomLogs)
+                .WithMany(sl => sl.SymptomLogs)
                 .HasForeignKey(sl => sl.PatientId);
 
             // SymptomLog > Symptom relationship
             builder.Entity<SymptomLog>()
                 .HasOne(sl => sl.Symptom)
                 .WithMany() 
-                .HasForeignKey(sl => sl.SymptomId)
+                .HasForeignKey(s => s.SymptomId)
                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes to avoid deleting symptoms when a log is deleted
+
+            // ConditionSymptom > Condition relationship
+            builder.Entity<ConditionSymptom>()
+                .HasOne(cs => cs.Condition)
+                .WithMany()
+                .HasForeignKey(cs => cs.ConditionId);
+
+            // ConditionSymptom > Symptom relationship
+            builder.Entity<ConditionSymptom>()
+                .HasOne(cs => cs.Symptom)
+                .WithMany()
+                .HasForeignKey(cs => cs.SymptomId);
+            #endregion 
         }
         public DbSet<Patient> Patient { get; set; }
         public DbSet<SymptomLog> SymptomLog { get; set; }

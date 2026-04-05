@@ -7,16 +7,13 @@ namespace SymptomLogger.src.Entity
     {
         [Key]
         public int SymptomId { get; set; } // Primary key
-
-        public string Category { get; set; } // Type
-        public string Description { get; set; }
         public string Name { get; set; }
-        public DateTime Date { get; set; } = DateTime.Now;
+        public string Category { get; set; } // e.g., "Pain", "Fatigue", "Nausea"
+        public string BodySystem { get; set; } // e.g., "Musculoskeletal", "Digestive", "Neurological"
+        public string? Description { get; set; }
         // add bool isActive for soft delete?
 
         public Patient Patient { get; set; } // Navigation property to Patient
-
         public string PatientId { get; set; } // Foreign key
-
     }
 }

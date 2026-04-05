@@ -24,7 +24,7 @@ namespace SymptomLogger.src.AutoMapper
             #endregion
 
             // Symptom log
-            #region Symptom
+            #region Symptom log
             CreateMap<CreateSymptomLogDTO, SymptomLog>();
             CreateMap<UpdateSymptomLogDTO, SymptomLog>();
             CreateMap<SymptomLog, UpdateSymptomLogDTO>(); // for patching, to convert entity back to DTO
