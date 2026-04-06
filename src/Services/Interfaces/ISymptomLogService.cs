@@ -2,7 +2,7 @@
 using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.DTO.SymptomLog;
 
-namespace SymptomLogger.src.Services
+namespace SymptomLogger.src.Services.Interfaces
 {
     public interface ISymptomLogService
     {

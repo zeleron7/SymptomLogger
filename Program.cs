@@ -16,6 +16,7 @@ using SymptomLogger.src.Validators;
 using FluentValidation.AspNetCore;
 using SymptomLogger.src.Middleware;
 using Microsoft.AspNetCore.Mvc;
+using SymptomLogger.src.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SymptomLoggerContext>(options =>

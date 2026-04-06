@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SymptomLogger.src.Services;
+using SymptomLogger.src.Services.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -23,7 +23,7 @@ namespace SymptomLogger.src.Controllers
         [HttpPost("seed")]
         public async Task<IActionResult> SeedDatabase()
         {
-            await _seedDatabaseService.SeedDatabase();
+            await _seedDatabaseService.SeedDatabaseAsync();
             return Ok(new { message = "Database seeded successfully" });
         }
         #endregion
@@ -33,7 +33,7 @@ namespace SymptomLogger.src.Controllers
         [HttpDelete("clear")]
         public async Task<IActionResult> ClearDatabase()
         {
-            await _seedDatabaseService.ClearDatabase();
+            await _seedDatabaseService.ClearDatabaseAsync();
             return Ok(new { message = "Database cleared successfully" });
         }
         #endregion 

@@ -15,7 +15,7 @@ using SymptomLogger.src.DTO;
 using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.Entity;
 using SymptomLogger.src.Repositories.Interfaces;
-using SymptomLogger.src.Services;
+using SymptomLogger.src.Services.Interfaces;
 using SymptomLogger.src.Utils;
 
 namespace SymptomLogger.src.Controllers

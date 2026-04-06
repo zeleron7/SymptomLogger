@@ -3,6 +3,7 @@ using SymptomLogger.src.DTO.Patient;
 using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.Entity;
 using SymptomLogger.src.DTO.SymptomLog;
+using SymptomLogger.src.DTO.Condition;
 
 namespace SymptomLogger.src.AutoMapper
 {
@@ -32,6 +33,15 @@ namespace SymptomLogger.src.AutoMapper
             CreateMap<SymptomLog, ResponseSymptomLogDTO>();
             CreateMap<SymptomLog, Symptom>();
             #endregion
+
+            // Condition
+            #region Condition
+            CreateMap<CreateConditionDTO, Condition>();
+            CreateMap<UpdateConditionDTO, Condition>();
+            CreateMap<Condition, UpdateConditionDTO>(); // for patching, to convert entity back to DTO
+
+            CreateMap<Condition, ResponseConditionDTO>();
+            #endregion 
         }
     }
 }

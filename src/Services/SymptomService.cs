@@ -9,6 +9,7 @@ using SymptomLogger.src.Repositories.Interfaces;
 using System.Net;
 using System.Security.Claims;
 using AutoMapper.QueryableExtensions;
+using SymptomLogger.src.Services.Interfaces;
 
 namespace SymptomLogger.src.Services
 {
@@ -61,7 +62,6 @@ namespace SymptomLogger.src.Services
                     _logger.LogInformation("CreateSymptomDTO is null.");
                     throw new ArgumentNullException(nameof(dto), "Symptom cannot be null.");
                 }
-
                 // map DTO to entity
                 var symptom = _mapper.Map<Symptom>(dto);
 

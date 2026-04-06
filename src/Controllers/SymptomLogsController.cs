@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using SymptomLogger.src.Data;
 using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.Entity;
-using SymptomLogger.src.Services;
 using SymptomLogger.src.Utils;
 using SymptomLogger.src.DTO.SymptomLog;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
+using SymptomLogger.src.Services.Interfaces;
 
 namespace SymptomLogger.src.Controllers
 {

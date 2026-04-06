@@ -4,7 +4,7 @@ using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.Entity;
 using System.Security.Claims;
 
-namespace SymptomLogger.src.Services
+namespace SymptomLogger.src.Services.Interfaces
 {
     public interface ISymptomService
     {

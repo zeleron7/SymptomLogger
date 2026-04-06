@@ -2,6 +2,7 @@
 using SymptomLogger.src.Data;
 using SymptomLogger.src.Entity;
 using SymptomLogger.src.Repositories.Interfaces;
+using SymptomLogger.src.Services.Interfaces;
 
 
 namespace SymptomLogger.src.Services
@@ -18,7 +19,7 @@ namespace SymptomLogger.src.Services
         }
         // Seed database
         #region SeedDatabase
-        public async Task SeedDatabase()
+        public async Task SeedDatabaseAsync()
         {
             using (var streamReader = new StreamReader(seedSource))
             {
@@ -53,7 +54,7 @@ namespace SymptomLogger.src.Services
 
         //Clear database
         #region ClearDatabase
-        public async Task ClearDatabase()
+        public async Task ClearDatabaseAsync()
         {
             var symptoms = await _context.Symptom.ToListAsync();
 

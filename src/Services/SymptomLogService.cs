@@ -6,6 +6,7 @@ using SymptomLogger.src.DTO.SymptomLog;
 using SymptomLogger.src.Entity;
 using SymptomLogger.src.Repositories;
 using SymptomLogger.src.Repositories.Interfaces;
+using SymptomLogger.src.Services.Interfaces;
 
 namespace SymptomLogger.src.Services
 {

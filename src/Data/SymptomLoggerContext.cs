@@ -72,5 +72,6 @@ namespace SymptomLogger.src.Data
         public DbSet<Patient> Patient { get; set; }
         public DbSet<SymptomLog> SymptomLog { get; set; }
         public DbSet<Symptom> Symptom { get; set; }
+        public DbSet<Condition> Condition { get; set; }
     }
 }
