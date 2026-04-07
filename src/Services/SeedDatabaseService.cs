@@ -11,7 +11,7 @@ namespace SymptomLogger.src.Services
     {
         private readonly ILogger<SeedDatabaseService> _logger;
         private readonly SymptomLoggerContext _context;
-        const string seedSource = "./symptoms.json";
+        private const string seedSource = "src/Data/SeedData/symptoms.json"; // ./symptoms.json
         public SeedDatabaseService( ILogger<SeedDatabaseService> logger, SymptomLoggerContext context)
         {
             _context = context;
@@ -26,8 +26,8 @@ namespace SymptomLogger.src.Services
                 var jsonData = await streamReader.ReadToEndAsync();
                 if (string.IsNullOrEmpty(jsonData))
                 {
-                    _logger.LogError("JSON data is empty or null.");
-                    throw new Exception("JSON data is empty or null.");
+                    _logger.LogError("JSON data is empty.");
+                    throw new Exception("JSON data is empty.");
                 }
                 var symptoms = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Symptom>>(jsonData);
                 if (symptoms == null)
@@ -46,7 +46,7 @@ namespace SymptomLogger.src.Services
                 }
 
                 await _context.AddRangeAsync(symptoms);
-                _logger.LogInformation("Seeded symptoms into database.");
+                _logger.LogInformation("Sucessfully seeded symptoms into database.");
                 await _context.SaveChangesAsync();
             }
         }

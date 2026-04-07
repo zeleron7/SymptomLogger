@@ -362,6 +362,11 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# json data / env files
+# json data 
 symptoms.json
-.env
+conditions.json
+src/Data/SeedData/symptoms.json
+src/Data/SeedData/conditions.json
+
+# env Files
+*.env

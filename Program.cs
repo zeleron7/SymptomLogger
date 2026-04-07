@@ -58,8 +58,13 @@ builder.Services.AddScoped<ISymptomService, SymptomService>();
 builder.Services.AddScoped<ISymptomLogRepository, SymptomLogRepository>();
 builder.Services.AddScoped<ISymptomLogService, SymptomLogService>();
 
+// DI Conditions
+builder.Services.AddScoped<IConditionRepository, ConditionRepository>();
+builder.Services.AddScoped<IConditionService, ConditionService>();
+
 // DI Seeder
 builder.Services.AddScoped<ISeedDatabaseService, SeedDatabaseService>();
+builder.Services.AddScoped<ConditionSeeder>();
 #endregion 
 
 // Register FluentValidation validators
@@ -136,6 +141,13 @@ builder.Services.AddAuthentication(options =>
 #endregion 
 
 var app = builder.Build();
+
+// Seeder
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<ConditionSeeder>();
+    seeder.SeedConditions();
+}
 
 app.UseSwagger();
 
