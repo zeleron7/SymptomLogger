@@ -140,6 +140,21 @@ builder.Services.AddAuthentication(options =>
 });
 #endregion 
 
+// Cors configuration to allow Streamlit frontend to access the API
+#region CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowStreamlit",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:8501") // Streamlit default port
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+#endregion 
+
 var app = builder.Build();
 
 // Seeder
@@ -148,6 +163,8 @@ using (var scope = app.Services.CreateScope())
     var seeder = scope.ServiceProvider.GetRequiredService<ConditionSeeder>();
     seeder.SeedConditions();
 }
+
+app.UseCors("AllowStreamlit");
 
 app.UseSwagger();
 

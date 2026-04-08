@@ -2,6 +2,7 @@
 
 namespace SymptomLogger.src.Entity
 {
+    // Seed entity (autoimmune diseases)
     public class Condition
     {
         [Key]

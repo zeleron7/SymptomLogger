@@ -71,11 +71,11 @@ namespace SymptomLogger.src.Data
 
             // Seed initial data for Conditions
             #region Condition seeding
-            builder.Entity<Condition>().HasData(
+            /*builder.Entity<Condition>().HasData(
                 new Condition { ConditionId = 1, Name = "Fibromyalgia", System = "Musculoskeletal", IcdCode = "M79.7" },
                 new Condition { ConditionId = 2, Name = "Irritable Bowel Syndrome (IBS)", System = "Digestive", IcdCode = "K58" },
                 new Condition { ConditionId = 3, Name = "Migraine", System = "Neurological", IcdCode = "G43" }
-            );
+            );*/
             #endregion 
         }
         public DbSet<Patient> Patient { get; set; }
