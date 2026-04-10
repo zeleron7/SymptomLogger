@@ -2,8 +2,8 @@
 {
     public class UpdateConditionDTO
     {
-        public string Name { get; set; }
-        public string System { get; set; } // e.g., "Musculoskeletal", "Digestive", "Neurological"
-        public string IcdCode { get; set; } // Optional ICD code for standardized condition classification
+        public string Name { get; set; } = "";
+        public string System { get; set; } = ""; // e.g., "Musculoskeletal", "Digestive", "Neurological"
+        public string IcdCode { get; set; } = ""; // Optional ICD code for standardized condition classification
     }
 }
