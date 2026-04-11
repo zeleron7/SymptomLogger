@@ -1,22 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using Serilog;
+using SymptomLogger.src.AutoMapper;
 using SymptomLogger.src.Data;
+using SymptomLogger.src.Entity;
+using SymptomLogger.src.Middleware;
+using SymptomLogger.src.Repositories;
 using SymptomLogger.src.Repositories.Interfaces;
 using SymptomLogger.src.Services;
-using Serilog;
-using SymptomLogger.src.Repositories;
-using Microsoft.AspNetCore.Identity;
-using SymptomLogger.src.Entity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using FluentValidation;
-using SymptomLogger.src.Validators;
-using FluentValidation.AspNetCore;
-using SymptomLogger.src.Middleware;
-using Microsoft.AspNetCore.Mvc;
 using SymptomLogger.src.Services.Interfaces;
+using SymptomLogger.src.Validators;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SymptomLoggerContext>(options =>
@@ -46,7 +47,8 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddEndpointsApiExplorer();
 
 // AutoMapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+//builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); < older way, which can lead to issues if there are multiple profiles or assemblies. 
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
 // Dependency Injection 
 #region DI
@@ -157,13 +159,14 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Seeder
+// Seed conditions on startup
 using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<ConditionSeeder>();
     seeder.SeedConditions();
 }
 
+// Use CORS policy
 app.UseCors("AllowStreamlit");
 
 app.UseSwagger();
