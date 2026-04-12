@@ -20,7 +20,6 @@ namespace SymptomLogger.src.Controllers
     [Route("api/v{version:apiVersion}/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IMapper _mapper;
         private readonly ILogger<AuthController> _logger;
         private readonly UserManager<Patient> _userManager;
         private readonly SignInManager<Patient> _signInManager;
@@ -29,14 +28,12 @@ namespace SymptomLogger.src.Controllers
             UserManager<Patient> userManager,
             SignInManager<Patient> signInManager,
             IConfiguration configuration,
-            ILogger<AuthController> logger,
-            IMapper mapper)
+            ILogger<AuthController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _logger = logger;
-            _mapper = mapper;
         }
 
         // POST: api/Auth/register
@@ -44,8 +41,14 @@ namespace SymptomLogger.src.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(CreatePatientDTO register)
         {
-            // map DTO to entity
-            var patient = _mapper.Map<Patient>(register);
+            // map dto to entity
+            var patient = new Patient
+            {
+                UserName = register.UserName,
+                Email = register.Email,
+                FirstName = register.FirstName,
+                LastName = register.LastName
+            };
 
             var result = await _userManager.CreateAsync(patient, register.Password);
             if (result.Succeeded)

@@ -166,12 +166,15 @@ using (var scope = app.Services.CreateScope())
     seeder.SeedConditions();
 }
 
+app.UseExceptionHandler();
+
 // Use CORS policy
 app.UseCors("AllowStreamlit");
 
 app.UseSwagger();
 
-app.UseExceptionHandler();
+app.UseSerilogRequestLogging(options
+  => options.EnrichDiagnosticContext = RequestEnricher.LogRequestDetails); // Enrich logs with additional request info (e.g., IP, User-Agent)
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -192,3 +195,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+Log.CloseAndFlush();

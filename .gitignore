@@ -363,8 +363,10 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # json data 
+autoimmune_diseases.json
 symptoms.json
 conditions.json
+src/Data/SeedData/autoimmune_diseases.json
 src/Data/SeedData/symptoms.json
 src/Data/SeedData/conditions.json
 

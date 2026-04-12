@@ -30,7 +30,7 @@ namespace SymptomLogger.src.Controllers
         public async Task<ActionResult<IQueryable<ResponseConditionDTO>>> GetAllConditions([FromQuery] PageParameters pageParameters)
         {
             _logger.LogInformation("Retrieving all conditions.");
-            var conditions = _conditionService.GetConditionsAsync();
+            var conditions = _conditionService.GetConditions();
 
             // Implement pagination using the PagedList utility class
             var pagedConditions = await PagedList<ResponseConditionDTO>.CreateAsync(conditions, pageParameters.PageNumber, pageParameters.PageSize);
@@ -57,11 +57,11 @@ namespace SymptomLogger.src.Controllers
             //var patientId = RetrievePatientId.GetPatientId(User);
 
             var condition = await _conditionService.GetConditionByIdAsync(id);
-            if (condition == null)
+            /*if (condition == null)
             {
                 _logger.LogWarning("Condition with ID {ConditionId} not found.", id);
                 return NotFound();
-            }
+            }*/
             _logger.LogInformation("Condition with ID {ConditionId} retrieved successfully.", id);
             return Ok(condition);
         }
@@ -75,13 +75,6 @@ namespace SymptomLogger.src.Controllers
         public async Task<IActionResult> UpdateSymptom(int id, [FromBody] JsonPatchDocument<UpdateConditionDTO> patchDoc)
         {
             _logger.LogInformation("Updating condition with ID {ConditionId}.", id);
-
-            if (patchDoc == null)
-            {
-                _logger.LogWarning("Patch document is null for condition with ID {ConditionId}.", id);
-                return BadRequest("Patch document cannot be null.");
-            }
-
             // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
             //var patientId = RetrievePatientId.GetPatientId(User);
 

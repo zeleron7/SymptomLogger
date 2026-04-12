@@ -7,7 +7,7 @@ namespace SymptomLogger.src.Services.Interfaces
 {
     public interface IConditionService
     {
-        IQueryable<ResponseConditionDTO> GetConditionsAsync();
+        IQueryable<ResponseConditionDTO> GetConditions();
         Task<ResponseConditionDTO> GetConditionByIdAsync(int id);
         Task<ResponseConditionDTO> AddConditionAsync(CreateConditionDTO dto);
         Task<ResponseConditionDTO> UpdateConditionAsync(int id, JsonPatchDocument<UpdateConditionDTO> patchDoc);

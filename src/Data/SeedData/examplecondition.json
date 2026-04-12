@@ -1,0 +1,32 @@
+[
+  {
+    "Id": 1,
+    "Name": "Rheumatoid Arthritis",
+    "System": "Musculoskeletal",
+    "IcdCode": "M05"
+  },
+  {
+    "Id": 2,
+    "Name": "Systemic Lupus Erythematosus",
+    "System": "Systemic",
+    "IcdCode": "M32"
+  },
+  {
+    "Id": 3,
+    "Name": "Multiple Sclerosis",
+    "System": "Nervous",
+    "IcdCode": "G35"
+  },
+  {
+    "Id": 4,
+    "Name": "Type 1 Diabetes Mellitus",
+    "System": "Endocrine",
+    "IcdCode": "E10"
+  },
+  {
+    "Id": 5,
+    "Name": "Hashimoto Thyroiditis",
+    "System": "Endocrine",
+    "IcdCode": "E06.3"
+  }
+]

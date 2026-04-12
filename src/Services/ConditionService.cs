@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using SymptomLogger.src.DTO.Condition;
 using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.DTO.SymptomLog;
@@ -8,6 +9,7 @@ using SymptomLogger.src.Entity;
 using SymptomLogger.src.Repositories;
 using SymptomLogger.src.Repositories.Interfaces;
 using SymptomLogger.src.Services.Interfaces;
+using SymptomLogger.src.Utils;
 
 namespace SymptomLogger.src.Services
 {
@@ -15,21 +17,24 @@ namespace SymptomLogger.src.Services
     {
         private readonly IConditionRepository _conditionRepository;
         private readonly ILogger<ConditionService> _logger;
-        private readonly IMapper _mapper;
-
-        public ConditionService(IConditionRepository conditionRepository, ILogger<ConditionService> logger, IMapper mapper)
+        
+        public ConditionService(IConditionRepository conditionRepository, ILogger<ConditionService> logger)
         {
             _conditionRepository = conditionRepository;
             _logger = logger;
-            _mapper = mapper;
         }
 
         // Get all Conditions
         #region GetConditions
-        public IQueryable<ResponseConditionDTO> GetConditionsAsync()
+        public IQueryable<ResponseConditionDTO> GetConditions()
         {
             return _conditionRepository.GetConditions()
-                .ProjectTo<ResponseConditionDTO>(_mapper.ConfigurationProvider);
+                .Select(c => new ResponseConditionDTO // manual mapping 
+                {
+                    Name = c.Name,
+                    System = c.System,
+                    IcdCode = c.IcdCode // handle null value ? 
+                });
         }
         #endregion
 
@@ -38,12 +43,22 @@ namespace SymptomLogger.src.Services
         public async Task<ResponseConditionDTO> GetConditionByIdAsync(int id)
         {
             var conditionById = await _conditionRepository.GetConditionById(id);
+
+            // null check to prevent null reference exception
             if (conditionById == null)
             {
                 _logger.LogWarning("Condition with ID {ConditionId} not found", id);
-                return null;
+                throw new NotFoundException($"Condition with ID {id} not found.");
             }
-            return _mapper.Map<ResponseConditionDTO>(conditionById);
+            // map entity to response dto
+            var responseDto = new ResponseConditionDTO
+            {
+                Name = conditionById.Name,
+                System = conditionById.System,
+                IcdCode = conditionById.IcdCode // handle null value ?
+            };
+
+            return responseDto;
         }
         #endregion
 
@@ -51,24 +66,32 @@ namespace SymptomLogger.src.Services
         #region AddConditionAsync
         public async Task<ResponseConditionDTO> AddConditionAsync(CreateConditionDTO dto)
         {
-            try
+            // null check to prevent null reference exception
+            if (dto == null)
             {
-                if (dto == null)
-                {
-                    _logger.LogInformation("CreateConditionDTO is null.");
-                    throw new ArgumentNullException(nameof(dto), "Condition cannot be null.");
-                }
-                // Map dto to entity
-                var condition = _mapper.Map<Condition>(dto);
-                
-                var createdCondition = await _conditionRepository.AddCondition(condition);
-                return _mapper.Map<ResponseConditionDTO>(condition);
+                _logger.LogInformation("CreateConditionDTO is null.");
+                throw new ArgumentNullException(nameof(dto), "Condition cannot be null.");
             }
-            catch (Exception ex)
+
+            // map dto to entity
+            var condition = new Condition
             {
-                _logger.LogError(ex, "An error occurred while adding a new condition. DTO: {@CreateConditionDTO}", dto);
-                throw new Exception("An error occurred while adding the condition.", ex);
-            }
+                Name = dto.Name,
+                System = dto.System,
+                IcdCode = dto.IcdCode
+            };
+
+            var createdCondition = await _conditionRepository.AddCondition(condition);
+
+            // map created condition to response dto
+            var responseDto = new ResponseConditionDTO
+            {
+                IcdCode = condition.IcdCode,
+                System = condition.System,
+                Name = dto.Name,
+            };
+
+            return responseDto;
         }
         #endregion
 
@@ -76,19 +99,49 @@ namespace SymptomLogger.src.Services
         #region UpdateConditionAsync
         public async Task<ResponseConditionDTO> UpdateConditionAsync(int id, JsonPatchDocument<UpdateConditionDTO> patchDoc)
         {
+            if (patchDoc == null)
+            {
+                _logger.LogWarning("Patch document is null for condition with ID {ConditionId}.", id);
+                throw new ArgumentNullException("Patch document cannot be null.");
+            }
+
             var conditionToUpdate = await _conditionRepository.GetConditionById(id);
             if (conditionToUpdate == null)
             {
                 _logger.LogWarning("Condition with ID {ConditionId} not found for update", id);
-                throw new KeyNotFoundException($"Condition with ID {id} not found.");
+                throw new NotFoundException($"Condition with ID {id} not found.");
             }
-            var dto = _mapper.Map<UpdateConditionDTO>(conditionToUpdate);
 
-            patchDoc.ApplyTo(dto);
-            _mapper.Map(dto, conditionToUpdate);
+            // create a dto to apply the patch document to
+            var updatedDto = new UpdateConditionDTO
+            {
+                Name = conditionToUpdate.Name,
+                System = conditionToUpdate.System,
+                IcdCode = conditionToUpdate.IcdCode // handle null value ?
+            };
 
-            var updatedCondition = await _conditionRepository.UpdateCondition(conditionToUpdate);
-            return _mapper.Map<ResponseConditionDTO>(updatedCondition);
+            patchDoc.ApplyTo(updatedDto);
+
+            // map updated dto back to entity
+            var updatedEntity = new Condition
+            {
+                Name = updatedDto.Name,
+                System = updatedDto.System,
+                IcdCode = updatedDto.IcdCode
+            };
+
+            // pass the updated entity to the repository to update in the database
+            var updatedCondition = await _conditionRepository.UpdateCondition(updatedEntity);
+
+            // map updated entity to response dto
+            var responseDto = new ResponseConditionDTO
+            {
+                Name = updatedCondition.Name,
+                System = updatedCondition.System,
+                IcdCode = updatedCondition.IcdCode // handle null value ?
+            };
+
+            return responseDto;
         }
         #endregion 
 

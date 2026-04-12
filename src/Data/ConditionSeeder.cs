@@ -7,7 +7,7 @@ namespace SymptomLogger.src.Data
     {
         private readonly SymptomLoggerContext _context;
         private readonly ILogger<ConditionSeeder> _logger;
-        private const string seedSource = "src/Data/SeedData/conditions.json"; // ./conditions.json
+        private const string seedSource = "src/Data/SeedData/autoimmune_diseases.json"; // ./conditions.json
         public ConditionSeeder(SymptomLoggerContext context, ILogger<ConditionSeeder> logger)
         {
             _context = context;
@@ -25,7 +25,10 @@ namespace SymptomLogger.src.Data
                     using (var streamReader = new StreamReader(seedSource))
                     {
                         var jsonData = streamReader.ReadToEnd();
-                        var conditions = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Condition>>(jsonData);
+                        var conditions = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Condition>>(jsonData)?
+                            .Select(c => { c.ConditionId = 0; return c;  })
+                            .ToList();  /* Reset ConditionId to 0 to allow database to auto-generate IDs otherwise
+                                         seeding will fail due to duplicate primary keys (EF generates ids) */
 
                         // Check if conditions already exist in the database to prevent duplicate seeding
                         if (_context.Condition.Any())
