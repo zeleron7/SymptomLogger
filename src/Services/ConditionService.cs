@@ -129,8 +129,6 @@ namespace SymptomLogger.src.Services
                 System = updatedDto.System,
                 IcdCode = updatedDto.IcdCode
             };
-
-            // pass the updated entity to the repository to update in the database
             var updatedCondition = await _conditionRepository.UpdateCondition(updatedEntity);
 
             // map updated entity to response dto

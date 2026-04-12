@@ -52,7 +52,7 @@ namespace SymptomLogger.src.Controllers
         }
         #endregion 
 
-        // GET: api/Symptoms/5
+        // GET: api/SymptomLogs/5
         #region Get symptom log by ID
         //[Authorize]
         [HttpGet("{id}")]
@@ -62,31 +62,36 @@ namespace SymptomLogger.src.Controllers
             var patientId = RetrievePatientId.GetPatientId(User);
 
             var symptom = await _symptomLogService.GetSymptomLogByIdAsync(id, patientId);
-            if (symptom == null)
-            {
-                _logger.LogWarning("Symptom with ID {SymptomId} not found.", id);
-                return NotFound();
-            }
             _logger.LogInformation("Symptom with ID {SymptomId} retrieved successfully.", id);
+
             return Ok(symptom);
         }
         #endregion
 
-        // Patch: api/Symptoms/5 
+        // POST: api/SymptomLogs
+        #region Create new symptom log
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult<ResponseSymptomLogDTO>> AddSymptomLog(CreateSymptomLogDTO dto)
+        {
+            _logger.LogInformation("Creating new symptom log");
+            var patientId = RetrievePatientId.GetPatientId(User);
+
+            var createdSymptom = await _symptomLogService.AddSymptomLogAsync(dto, patientId);
+            _logger.LogInformation("Symptom log created successfully with Note {Notes}.", createdSymptom.Notes);
+
+            return Ok(createdSymptom);
+        }
+        #endregion
+
+        // Patch: api/SymptomLogs/5 
         // JSON format [{"op": "replace", "path": "/notes", "value": "Updated notes"}]
-        #region Update symptom
+        #region Update symptom log
         [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateSymptomLog(int id, [FromBody] JsonPatchDocument<UpdateSymptomLogDTO> patchDoc)
         {
             _logger.LogInformation("Updating symptom log with ID {SymptomId}.", id);
-
-            if (patchDoc == null)
-            {
-                _logger.LogWarning("Patch document is null for symptom log with ID {SymptomId}.", id);
-                return BadRequest("Patch document cannot be null.");
-            }
-            // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
             var patientId = RetrievePatientId.GetPatientId(User);
 
             var updatedSymptomLog = await _symptomLogService.UpdateSymptomLogAsync(id, patchDoc, patientId);
@@ -96,25 +101,8 @@ namespace SymptomLogger.src.Controllers
         }
         #endregion
 
-        // POST: api/Symptoms
-        #region Create new symptom
-        [Authorize]
-        [HttpPost]
-        public async Task<ActionResult<ResponseSymptomLogDTO>> AddSymptomLog(CreateSymptomLogDTO dto)
-        {
-            _logger.LogInformation("Creating new symptom log");
-
-            // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
-            var patientId = RetrievePatientId.GetPatientId(User);
-            var createdSymptom = await _symptomLogService.AddSymptomLogAsync(dto, patientId);
-            _logger.LogInformation("Symptom log created successfully with Note {Notes}.", createdSymptom.Notes);
-
-            return Ok(createdSymptom);
-        }
-        #endregion
-
-        // DELETE: api/Symptoms/5
-        #region Delete symptom
+        // DELETE: api/SymptomLogs/5
+        #region Delete symptom log
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteSymptomLog(int id)

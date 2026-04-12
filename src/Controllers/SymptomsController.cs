@@ -36,7 +36,7 @@ namespace SymptomLogger.src.Controllers
 
         // GET: api/Symptoms
         #region Get all symptoms
-        [Authorize]
+        //[Authorize] // SET ADMIN ROLE LATER
         [HttpGet] 
         public async Task<ActionResult<IQueryable<ResponseSymptomDTO>>> GetAllSymptoms([FromQuery] PageParameters pageParameters)
         {
@@ -52,9 +52,7 @@ namespace SymptomLogger.src.Controllers
                 return NotFound();
             }
             _logger.LogInformation("Symptoms retrieved successfully. Count: {SymptomCount}.", symptoms.Count());
-
             return Ok(PagedSymptoms);
-
         }
         #endregion
 
@@ -66,15 +64,26 @@ namespace SymptomLogger.src.Controllers
         {
             _logger.LogInformation("Retrieving symptom with ID {SymptomId}.", id);
             var patientId = RetrievePatientId.GetPatientId(User);
-
             var symptom = await _symptomService.GetSymptomByIdAsync(id, patientId);
-            if (symptom == null)
-            {
-                _logger.LogWarning("Symptom with ID {SymptomId} not found.", id);
-                return NotFound();
-            }
+            
             _logger.LogInformation("Symptom with ID {SymptomId} retrieved successfully.", id);
             return Ok(symptom);
+        }
+        #endregion
+
+        // POST: api/Symptoms
+        #region Create new symptom
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult<ResponseSymptomDTO>> AddSymptom(CreateSymptomDTO dto)
+        {
+            _logger.LogInformation("Creating new symptom");
+            // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
+            var patientId = RetrievePatientId.GetPatientId(User);
+            var createdSymptom = await _symptomService.AddSymptomAsync(dto, patientId);
+
+            _logger.LogInformation("Symptom created successfully with Description {Description}.", createdSymptom.Description);
+            return Ok(createdSymptom);
         }
         #endregion
 
@@ -86,13 +95,6 @@ namespace SymptomLogger.src.Controllers
         public async Task<IActionResult> UpdateSymptom(int id, [FromBody] JsonPatchDocument<UpdateSymptomDTO> patchDoc)
         {
             _logger.LogInformation("Updating symptom with ID {SymptomId}.", id);
-
-            if (patchDoc == null)
-            {
-                _logger.LogWarning("Patch document is null for symptom with ID {SymptomId}.", id);
-                return BadRequest("Patch document cannot be null.");
-            }
-
             // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
             var patientId = RetrievePatientId.GetPatientId(User);
 
@@ -101,37 +103,6 @@ namespace SymptomLogger.src.Controllers
 
             return Ok(updatedSymptom);
 
-        }
-        #endregion
-
-        // POST: api/Symptoms
-        #region Create new symptom
-        [Authorize]
-        [HttpPost] 
-        public async Task<ActionResult<ResponseSymptomDTO>> AddSymptom(CreateSymptomDTO dto)
-        {
-            _logger.LogInformation("Creating new symptom");
-
-            // Check if Description is either empty or over 100 characters
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Invalid model state for creating symptom. Errors: {ModelErrors}.", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
-                return BadRequest(ModelState);
-            }
-
-            // validate default value 
-            if (dto.Description == "string")
-            {
-                _logger.LogWarning("Default value for Description field detected. Please provide a valid description.");
-                return BadRequest("Please describe your symptoms.");
-            }
-            
-            // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
-            var patientId = RetrievePatientId.GetPatientId(User);
-            var createdSymptom = await _symptomService.AddSymptomAsync(dto, patientId);
-             _logger.LogInformation("Symptom created successfully with Description {Description}.", createdSymptom.Description);
-
-            return Ok(createdSymptom);
         }
         #endregion
 

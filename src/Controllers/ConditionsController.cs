@@ -57,32 +57,9 @@ namespace SymptomLogger.src.Controllers
             //var patientId = RetrievePatientId.GetPatientId(User);
 
             var condition = await _conditionService.GetConditionByIdAsync(id);
-            /*if (condition == null)
-            {
-                _logger.LogWarning("Condition with ID {ConditionId} not found.", id);
-                return NotFound();
-            }*/
             _logger.LogInformation("Condition with ID {ConditionId} retrieved successfully.", id);
+
             return Ok(condition);
-        }
-        #endregion
-
-        // Patch: api/Conditions/5 
-        // JSON format [{"op": "replace", "path": "/Name", "value": "Updated name"}]
-        #region Update condition
-        //[Authorize] Should be authorized for Admin only, but for testing purposes, we will leave it open for now.
-        [HttpPatch("{id}")]
-        public async Task<IActionResult> UpdateSymptom(int id, [FromBody] JsonPatchDocument<UpdateConditionDTO> patchDoc)
-        {
-            _logger.LogInformation("Updating condition with ID {ConditionId}.", id);
-            // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
-            //var patientId = RetrievePatientId.GetPatientId(User);
-
-            var updatedCondition = await _conditionService.UpdateConditionAsync(id, patchDoc);
-            _logger.LogInformation("Symptom with ID {SymptomId} updated successfully.", id);
-
-            return Ok(updatedCondition);
-
         }
         #endregion
 
@@ -93,12 +70,30 @@ namespace SymptomLogger.src.Controllers
         public async Task<ActionResult<ResponseConditionDTO>> AddCondition(CreateConditionDTO dto)
         {
             _logger.LogInformation("Creating new condition");
-
             //var patientId = RetrievePatientId.GetPatientId(User); 
+
             var createdCondition = await _conditionService.AddConditionAsync(dto);
             _logger.LogInformation("Condition created successfully with Name {Name}.", createdCondition.Name);
 
             return Ok(createdCondition);
+        }
+        #endregion
+
+        // Patch: api/Conditions/5 
+        // JSON format [{"op": "replace", "path": "/Name", "value": "Updated name"}]
+        #region Update condition
+        //[Authorize] Should be authorized for Admin only, but for testing purposes, we will leave it open for now.
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> UpdateCondition(int id, [FromBody] JsonPatchDocument<UpdateConditionDTO> patchDoc)
+        {
+            _logger.LogInformation("Updating condition with ID {ConditionId}.", id);
+            //var patientId = RetrievePatientId.GetPatientId(User);
+
+            var updatedCondition = await _conditionService.UpdateConditionAsync(id, patchDoc);
+            _logger.LogInformation("Symptom with ID {SymptomId} updated successfully.", id);
+
+            return Ok(updatedCondition);
+
         }
         #endregion
 
@@ -109,8 +104,8 @@ namespace SymptomLogger.src.Controllers
         public async Task<IActionResult> DeleteCondition(int id)
         {
             _logger.LogInformation("Deleting condition with ID {ConditionId}.", id);
-
             //var patientId = RetrievePatientId.GetPatientId(User);
+
             var success = await _conditionService.DeleteConditionAsync(id);
 
             if (!success)

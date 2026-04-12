@@ -17,6 +17,7 @@ namespace SymptomLogger.src.Services
             _context = context;
             _logger = logger;
         }
+
         // Seed database
         #region SeedDatabase
         public async Task SeedDatabaseAsync()
@@ -26,14 +27,14 @@ namespace SymptomLogger.src.Services
                 var jsonData = await streamReader.ReadToEndAsync();
                 if (string.IsNullOrEmpty(jsonData))
                 {
-                    _logger.LogError("JSON data is empty.");
+                    _logger.LogWarning("JSON data is empty.");
                     throw new Exception("JSON data is empty.");
                 }
                 var symptoms = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Symptom>>(jsonData);
                 if (symptoms == null)
                 {
-                    _logger.LogError("Failed to deserialize symptoms from JSON.");
-                    throw new Exception("Failed to deserialize symptoms from JSON.");
+                    _logger.LogWarning("Failed to deserialize symptoms from JSON.");
+                    throw new ArgumentNullException("Failed to deserialize symptoms from JSON.");
                 }
                 // get first patient to assign symptoms to (FOR TESTING PURPOSE)
                 // ASSIGN TO ADMIN USER LATER

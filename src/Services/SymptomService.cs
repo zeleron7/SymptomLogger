@@ -10,6 +10,7 @@ using System.Net;
 using System.Security.Claims;
 using AutoMapper.QueryableExtensions;
 using SymptomLogger.src.Services.Interfaces;
+using SymptomLogger.src.Utils;
 
 namespace SymptomLogger.src.Services
 {
@@ -32,7 +33,12 @@ namespace SymptomLogger.src.Services
         public IQueryable<ResponseSymptomDTO> GetSymptoms()
         {
             return _symptomRepository.GetSymptoms()
-                .ProjectTo<ResponseSymptomDTO>(_mapper.ConfigurationProvider);
+                .Select(c => new ResponseSymptomDTO
+                {
+                    Category = c.Category,
+                    Description = c.Description ?? string.Empty,
+                    Name = c.Name,
+                });
         }
         #endregion
 
@@ -40,14 +46,30 @@ namespace SymptomLogger.src.Services
         #region GetSymptomByIdAsync
         public async Task<ResponseSymptomDTO> GetSymptomByIdAsync(int id, string patientId)
         {
-            var SymptomById = await _symptomRepository.GetSymptomById(id);
+            var symptomById = await _symptomRepository.GetSymptomById(id);
+
+            if (symptomById == null)
+            {
+                _logger.LogWarning("Symptom with ID {SymptomId} not found.", id);
+                throw new NotFoundException($"Symptom with ID {id} not found.");
+            }
+
             // validate patient ID to ensure the symptom being accessed belongs to the authenticated patient
-            if (SymptomById.PatientId != patientId) 
+            if (symptomById.PatientId != patientId) 
             {
                 _logger.LogWarning("User tried to retrieve symptom ID {SymptomId}", id);
                 throw new UnauthorizedAccessException();
             }
-            return _mapper.Map<ResponseSymptomDTO>(SymptomById);
+
+            // map the symptom entity to the response DTO
+            var responseDto = new ResponseSymptomDTO
+            {
+                Category = symptomById.Category,
+                Description = symptomById.Description ?? string.Empty,
+                Name = symptomById.Name,
+            };
+
+            return responseDto;
         }
         #endregion 
 
@@ -55,28 +77,36 @@ namespace SymptomLogger.src.Services
         #region AddSymptomAsync
         public async Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto, string patientId)
         {
-            try
+            if (dto == null)
             {
-                if (dto == null)
-                {
-                    _logger.LogInformation("CreateSymptomDTO is null.");
-                    throw new ArgumentNullException(nameof(dto), "Symptom cannot be null.");
-                }
-                // map DTO to entity
-                var symptom = _mapper.Map<Symptom>(dto);
-
-                // set the patientId passed from the controller to ensure the symptom is associated with the correct patient
-                symptom.PatientId = patientId;
-
-                var CreatedSymptom = await _symptomRepository.AddSymptom(symptom, patientId);
-                return _mapper.Map<ResponseSymptomDTO>(CreatedSymptom);
+                _logger.LogInformation("CreateSymptomDTO is null.");
+                throw new ArgumentNullException(nameof(dto), "Symptom cannot be null.");
             }
 
-            catch (Exception ex)
+            // map DTO to entity
+            var symptom = new Symptom
             {
-                _logger.LogError(ex, "An error occurred while adding a new symptom. DTO: {@CreateSymptomDTO}", dto);
-                throw new Exception("An error occurred while adding the symptom.", ex);
-            }
+                Name = dto.Name,
+                Description = dto.Description,
+                Category = dto.Category,
+                BodySystem = dto.BodySystem,
+            };
+
+            // set the patientId passed from the controller to ensure the symptom is associated with the correct patient
+            symptom.PatientId = patientId;
+
+            var CreatedSymptom = await _symptomRepository.AddSymptom(symptom, patientId);
+
+            // map the created symptom entity to the response DTO
+            var responseDto = new ResponseSymptomDTO
+            {
+                Name = CreatedSymptom.Name,
+                Description = CreatedSymptom.Description ?? string.Empty,
+                Category = CreatedSymptom.Category,
+                BodySystem = CreatedSymptom.BodySystem
+            };
+
+            return responseDto;
         }
         #endregion
 
@@ -84,31 +114,59 @@ namespace SymptomLogger.src.Services
         #region UpdateSymptomAsync
         public async Task<ResponseSymptomDTO> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc, string patientId)
         {
-            var updatedSymptom = await _symptomRepository.GetSymptomById(id);
+            if (patchDoc == null)
+            {
+                _logger.LogInformation("JsonPatchDocument is null.");
+                throw new ArgumentNullException(nameof(patchDoc), "Patch document cannot be null.");
+            }
 
-            if (updatedSymptom.PatientId != patientId)
+            var symptomToUpdate = await _symptomRepository.GetSymptomById(id);
+
+            if (symptomToUpdate.PatientId != patientId)
             {
                 _logger.LogWarning("Unknown user tried to update symptom with ID {SymptomId}", id);
                 throw new UnauthorizedAccessException();
             }
 
-            if (updatedSymptom == null)
+            if (symptomToUpdate == null)
             {
                 _logger.LogInformation("Symptom with ID {SymptomId} not found for update.", id);
                 throw new KeyNotFoundException($"Symptom with ID {id} not found.");
             }
 
-            // map updated symptom to dto
-            var dto = _mapper.Map<UpdateSymptomDTO>(updatedSymptom);
+            // create a DTO to apply the patch document to
+            #region ApplyPatch
+            var updatedDto = new UpdateSymptomDTO
+            {
+                Name = symptomToUpdate.Name,
+                Description = symptomToUpdate.Description ?? string.Empty,
+                Category = symptomToUpdate.Category,
+                BodySystem = symptomToUpdate.BodySystem ?? string.Empty,
+            };
+            #endregion 
 
-            /* apply the patch document to dto > map the patched dto back to the symptom entity >
-               set the patientId to ensure the symptom remains associated with the correct patient*/
-            patchDoc.ApplyTo(dto);
-            _mapper.Map(dto, updatedSymptom);
-            updatedSymptom.PatientId = patientId;
+            patchDoc.ApplyTo(updatedDto);
 
-            var UpdatedSymptom = await _symptomRepository.UpdateSymptom(updatedSymptom, patientId);
-            return _mapper.Map<ResponseSymptomDTO>(UpdatedSymptom);
+            // Copy the updated values from the DTO back to the symptom entity
+            #region copyValues
+            symptomToUpdate.Name = updatedDto.Name;
+            symptomToUpdate.Category = updatedDto.Category;
+            symptomToUpdate.BodySystem = updatedDto.BodySystem;
+            symptomToUpdate.Description = updatedDto.Description;
+            #endregion 
+
+            symptomToUpdate.PatientId = patientId; // ensure the patientId is set to the authenticated patient's ID to prevent unauthorized updates
+
+            var UpdatedSymptom = await _symptomRepository.UpdateSymptom(symptomToUpdate, patientId);
+            //return _mapper.Map<ResponseSymptomDTO>(UpdatedSymptom);
+            var responseDto = new ResponseSymptomDTO
+            {
+                Name = UpdatedSymptom.Name,
+                Description = UpdatedSymptom.Description ?? string.Empty,
+                Category = UpdatedSymptom.Category,
+            };
+
+            return responseDto;
         }
         #endregion
 

@@ -2,6 +2,7 @@
 {
     public interface ISeedDatabaseService
     {
+        // Seed sample data for testing and development purposes
         Task SeedDatabaseAsync();
         Task ClearDatabaseAsync();
     }
