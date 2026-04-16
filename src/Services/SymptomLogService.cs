@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.JsonPatch;
 using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.DTO.SymptomLog;
+using SymptomLogger.src.DTO.SymptomLogEntry;
 using SymptomLogger.src.Entity;
 using SymptomLogger.src.Repositories;
 using SymptomLogger.src.Repositories.Interfaces;
@@ -27,10 +28,10 @@ namespace SymptomLogger.src.Services
         public IQueryable<ResponseSymptomLogDTO> GetSymptomLogs()
         {
             return _symptomLogRepository.GetSymptomLogs()
-                .Select(c => new ResponseSymptomLogDTO // manul mapping 
+                .Select(c => new ResponseSymptomLogDTO // manual mapping
                 {
                     Notes = c.Notes,
-                    Severity = c.Severity,
+                    //Severity = c.Severity,
                     DurationMinutes = c.DurationMinutes,
                     StressLevel = c.StressLevel,
                     SleepHours = c.SleepHours,
@@ -62,7 +63,7 @@ namespace SymptomLogger.src.Services
             var responseDto = new ResponseSymptomLogDTO
             {
                 Notes = symptomLogById.Notes,
-                Severity = symptomLogById.Severity,
+                //Severity = symptomLogById.Severity,
                 DurationMinutes = symptomLogById.DurationMinutes,
                 StressLevel = symptomLogById.StressLevel,
                 SleepHours = symptomLogById.SleepHours,
@@ -81,16 +82,22 @@ namespace SymptomLogger.src.Services
             var symptomLog = new SymptomLog
             {
                 Notes = dto.Notes,
-                Severity = dto.Severity,
                 DurationMinutes = dto.DurationMinutes ?? 0,
                 StressLevel = dto.StressLevel ?? 0,
                 SleepHours = dto.SleepHours ?? 0,
-                isFlare = dto.isFlare
+                isFlare = dto.isFlare,
+                PatientId = patientId, // set the patientId on the symptom log to ensure it is associated with the correct patient
+                SymptomLogEntries = dto.Symptoms.Select(s => new SymptomLogEntry
+                {
+                    SymptomId = dto.SymptomId,
+                    SymptomName = s.SymptomName,
+                    Severity = s.Severity
+                }).ToList()
             };
 
             // set the patientId and symptomId to ensure the new symptom log is associated with the correct patient and symptom
-            symptomLog.PatientId = patientId;
-            symptomLog.SymptomId = dto.SymptomId; 
+            //symptomLog.PatientId = patientId;
+            //symptomLog.SymptomId = dto.SymptomId; 
 
             if (dto == null)
             {
@@ -103,11 +110,18 @@ namespace SymptomLogger.src.Services
             var responseDto = new ResponseSymptomLogDTO
             {
                 Notes = CreatedSymptomLog.Notes,
-                Severity = CreatedSymptomLog.Severity,
+                //Severity = CreatedSymptomLog.Severity,
                 DurationMinutes = CreatedSymptomLog.DurationMinutes,
                 StressLevel = CreatedSymptomLog.StressLevel,
                 SleepHours = CreatedSymptomLog.SleepHours,
-                isFlare = CreatedSymptomLog.isFlare
+                isFlare = CreatedSymptomLog.isFlare,
+
+                Symptoms = CreatedSymptomLog.SymptomLogEntries.Select(e => new ResponseSymptomLogEntryDTO
+                {
+                    SymptomName = e.SymptomName,
+                    Severity = e.Severity
+                }).ToList()
+
             };
 
             return responseDto;
@@ -143,7 +157,7 @@ namespace SymptomLogger.src.Services
             var updatedDto = new UpdateSymptomLogDTO
             {
                 Notes = symptomLogToUpdate.Notes,
-                Severity = symptomLogToUpdate.Severity,
+                //Severity = symptomLogToUpdate.Severity,
                 DurationMinutes = symptomLogToUpdate.DurationMinutes,
                 StressLevel = symptomLogToUpdate.StressLevel,
                 SleepHours = symptomLogToUpdate.SleepHours,
@@ -156,7 +170,7 @@ namespace SymptomLogger.src.Services
             // copy DTO values back into the tracked entity (preserve keys)
             #region copyValues
             symptomLogToUpdate.Notes = updatedDto.Notes;
-            symptomLogToUpdate.Severity = updatedDto.Severity;
+            //symptomLogToUpdate.Severity = updatedDto.Severity;
             symptomLogToUpdate.DurationMinutes = updatedDto.DurationMinutes ?? 0;
             symptomLogToUpdate.StressLevel = updatedDto.StressLevel ?? 0;
             symptomLogToUpdate.SleepHours = updatedDto.SleepHours ?? 0;
@@ -173,7 +187,7 @@ namespace SymptomLogger.src.Services
             var responseDto = new ResponseSymptomLogDTO
             {
                 Notes = updated.Notes,
-                Severity = updated.Severity,
+                //Severity = updated.Severity,
                 DurationMinutes = updated.DurationMinutes,
                 StressLevel = updated.StressLevel,
                 SleepHours = updated.SleepHours,

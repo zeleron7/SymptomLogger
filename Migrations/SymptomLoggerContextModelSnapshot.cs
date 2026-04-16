@@ -17,7 +17,7 @@ namespace SymptomLogger.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.12")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -164,6 +164,7 @@ namespace SymptomLogger.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ConditionId"));
 
                     b.Property<string>("IcdCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -337,16 +338,10 @@ namespace SymptomLogger.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Severity")
-                        .HasColumnType("int");
-
                     b.Property<int>("SleepHours")
                         .HasColumnType("int");
 
                     b.Property<int>("StressLevel")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SymptomId")
                         .HasColumnType("int");
 
                     b.Property<bool>("isFlare")
@@ -356,9 +351,37 @@ namespace SymptomLogger.Migrations
 
                     b.HasIndex("PatientId");
 
+                    b.ToTable("SymptomLog");
+                });
+
+            modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLogEntry", b =>
+                {
+                    b.Property<int>("SymptomLogEntryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SymptomLogEntryId"));
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SymptomId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SymptomLogId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SymptomName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SymptomLogEntryId");
+
                     b.HasIndex("SymptomId");
 
-                    b.ToTable("SymptomLog");
+                    b.HasIndex("SymptomLogId");
+
+                    b.ToTable("SymptomLogEntry");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -450,15 +473,26 @@ namespace SymptomLogger.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLogEntry", b =>
+                {
                     b.HasOne("SymptomLogger.src.Entity.Symptom", "Symptom")
                         .WithMany()
                         .HasForeignKey("SymptomId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Patient");
+                    b.HasOne("SymptomLogger.src.Entity.SymptomLog", "SymptomLog")
+                        .WithMany("SymptomLogEntries")
+                        .HasForeignKey("SymptomLogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Symptom");
+
+                    b.Navigation("SymptomLog");
                 });
 
             modelBuilder.Entity("SymptomLogger.src.Entity.Patient", b =>
@@ -466,6 +500,11 @@ namespace SymptomLogger.Migrations
                     b.Navigation("SymptomLogs");
 
                     b.Navigation("Symptoms");
+                });
+
+            modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLog", b =>
+                {
+                    b.Navigation("SymptomLogEntries");
                 });
 #pragma warning restore 612, 618
         }

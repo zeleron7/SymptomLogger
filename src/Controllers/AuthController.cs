@@ -86,15 +86,26 @@ namespace SymptomLogger.src.Controllers
         }
         #endregion
 
+        // POST: api/Auth/logout
+        #region logout
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation("Patient logged out.");
+            return Ok(new { message = "Logout successful" });
+        }
+        #endregion 
+
         // Generate JWT token
         #region GenerateJwtToken
-        private string GenerateJwtToken(Patient user)
+        private string GenerateJwtToken(Patient patient)
         {
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+            new Claim(JwtRegisteredClaimNames.Sub, patient.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
+            new Claim(ClaimTypes.NameIdentifier, patient.Id)
         };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

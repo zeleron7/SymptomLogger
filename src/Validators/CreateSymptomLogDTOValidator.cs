@@ -12,11 +12,11 @@ namespace SymptomLogger.src.Validators
                 .NotEqual("string", StringComparer.OrdinalIgnoreCase)
                 .NotEmpty().WithMessage("Note is required.");
 
-            RuleFor(x => x.Severity)
-                .InclusiveBetween(1, 10).WithMessage("Severity must be between 1 and 10.");
+            //RuleFor(x => x.Severity)
+            //    .InclusiveBetween(1, 10).WithMessage("Severity must be between 1 and 10.");
 
-            RuleFor(x => x.SymptomId)
-               .GreaterThan(0).WithMessage("Symptom ID must be greater than 0.");
+            //RuleFor(x => x.SymptomId)
+              // .GreaterThan(0).WithMessage("Symptom ID must be greater than 0.");
 
             RuleFor(x => x.DurationMinutes)
                 .GreaterThan(0).When(x => x.DurationMinutes.HasValue)

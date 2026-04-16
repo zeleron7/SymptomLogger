@@ -15,6 +15,10 @@ namespace SymptomLogger.src.Validators
             RuleFor(x => x.LastName)
                 .NotEqual("string", StringComparer.OrdinalIgnoreCase)
                 .NotEmpty().WithMessage("Last name is required.");
+
+            RuleFor(x => x.Age)
+                .GreaterThan(0).WithMessage("Age must be greater than 0.");
+
         }
     }
 }
