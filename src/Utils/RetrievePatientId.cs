@@ -4,12 +4,16 @@ namespace SymptomLogger.src.Utils
 {
     public static class RetrievePatientId
     {
-        public static string? GetPatientId(ClaimsPrincipal patient)
+        // Method to retrieve the patient ID from the claims of the authenticated user
+        public static string GetPatientId(ClaimsPrincipal patient)
         {
-            // validate for a valid GUID otherwise it retrieves the email as patient ID
-            return patient.Claims
-                .Where(c => c.Type == ClaimTypes.NameIdentifier && Guid.TryParse(c.Value, out _))
-                .Select(c => c.Value).FirstOrDefault();
+            var claim = patient.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (claim == null)
+            {
+                throw new InvalidOperationException("Patient ID claim not found.");
+            }
+            return claim.Value;
         }
     }
 }

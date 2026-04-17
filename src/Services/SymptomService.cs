@@ -18,14 +18,11 @@ namespace SymptomLogger.src.Services
     {
         private readonly ISymptomRepository _symptomRepository;
         private readonly ILogger<SymptomService> _logger;
-        private readonly IMapper _mapper;
 
-        public SymptomService(ISymptomRepository symptomRepository, ILogger<SymptomService> logger,
-            IMapper mapper)
+        public SymptomService(ISymptomRepository symptomRepository, ILogger<SymptomService> logger)
         {
             _symptomRepository = symptomRepository;
             _logger = logger;
-            _mapper = mapper;
         }
 
         // Get all symptoms

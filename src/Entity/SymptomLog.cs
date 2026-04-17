@@ -7,7 +7,6 @@ namespace SymptomLogger.src.Entity
         [Key]
         public int SymptomLogId { get; set; } // Primary key
         public string Notes { get; set; }
-        //public int Severity { get; set; }
         public DateTime LoggedAt { get; set; } = DateTime.Now;
 
         // Analyze potential triggers and patterns
@@ -21,8 +20,6 @@ namespace SymptomLogger.src.Entity
 
         // SymptomLog can have multiple SymptomLogEntries, representing different symptoms logged at the same time
         public ICollection<SymptomLogEntry> SymptomLogEntries { get; set; } 
-        //public Symptom Symptom { get; set; } // Navigation property to Symptom
-        //public int SymptomId { get; set; } // Foreign key
     }
 }
     

@@ -31,11 +31,15 @@ namespace SymptomLogger.src.Services
                 .Select(c => new ResponseSymptomLogDTO // manual mapping
                 {
                     Notes = c.Notes,
-                    //Severity = c.Severity,
                     DurationMinutes = c.DurationMinutes,
                     StressLevel = c.StressLevel,
                     SleepHours = c.SleepHours,
-                    isFlare = c.isFlare
+                    isFlare = c.isFlare,
+                    Symptoms = c.SymptomLogEntries.Select(e => new ResponseSymptomLogEntryDTO // map each symptom log entry to response DTO
+                    {
+                        SymptomName = e.SymptomName,
+                        Severity = e.Severity
+                    }).ToList()
                 });                                      
         }
         #endregion
@@ -78,51 +82,52 @@ namespace SymptomLogger.src.Services
         #region AddSymptomLogAsync
         public async Task<ResponseSymptomLogDTO> AddSymptomLogAsync(CreateSymptomLogDTO dto, string patientId)
         {
-            // map DTO to entity
+            if (dto == null)
+            {
+                _logger.LogInformation("CreateSymptomLogDTO is null.");
+                throw new ArgumentNullException(nameof(dto), "Symptom log cannot be null.");
+            }
+
+            // Map DTO to entity
+            #region MappingRequest
             var symptomLog = new SymptomLog
             {
+                PatientId = patientId, // set the patientId on the symptom log to ensure it is associated with the correct patient
                 Notes = dto.Notes,
                 DurationMinutes = dto.DurationMinutes ?? 0,
                 StressLevel = dto.StressLevel ?? 0,
                 SleepHours = dto.SleepHours ?? 0,
-                isFlare = dto.isFlare,
-                PatientId = patientId, // set the patientId on the symptom log to ensure it is associated with the correct patient
-                SymptomLogEntries = dto.Symptoms.Select(s => new SymptomLogEntry
+                isFlare = dto.isFlare ?? false, // false by default if not provided
+
+                SymptomLogEntries = dto.Symptoms.Select(s => new SymptomLogEntry // map each symptom log entry DTO to entity
                 {
                     SymptomId = dto.SymptomId,
                     SymptomName = s.SymptomName,
                     Severity = s.Severity
                 }).ToList()
             };
+            #endregion 
 
-            // set the patientId and symptomId to ensure the new symptom log is associated with the correct patient and symptom
-            //symptomLog.PatientId = patientId;
-            //symptomLog.SymptomId = dto.SymptomId; 
-
-            if (dto == null)
-            {
-                _logger.LogInformation("CreateSymptomLogDTO is null.");
-                throw new ArgumentNullException(nameof(dto), "Symptom log cannot be null.");
-            }
             var CreatedSymptomLog = await _symptomLogRepository.AddSymptomLog(symptomLog, patientId);
 
-            // map the created symptom log entity back to response DTO
+            // Map the created symptom log entity back to response DTO
+            #region MappingResponse
             var responseDto = new ResponseSymptomLogDTO
             {
                 Notes = CreatedSymptomLog.Notes,
-                //Severity = CreatedSymptomLog.Severity,
                 DurationMinutes = CreatedSymptomLog.DurationMinutes,
                 StressLevel = CreatedSymptomLog.StressLevel,
                 SleepHours = CreatedSymptomLog.SleepHours,
                 isFlare = CreatedSymptomLog.isFlare,
 
-                Symptoms = CreatedSymptomLog.SymptomLogEntries.Select(e => new ResponseSymptomLogEntryDTO
+                Symptoms = CreatedSymptomLog.SymptomLogEntries.Select(e => new ResponseSymptomLogEntryDTO // map each symptom log entry entity to response DTO
                 {
                     SymptomName = e.SymptomName,
                     Severity = e.Severity
                 }).ToList()
 
             };
+            #endregion 
 
             return responseDto;
         }

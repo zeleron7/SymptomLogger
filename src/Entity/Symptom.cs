@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SymptomLogger.src.Entity
 {
+    // Represents a symptom (definition of a symptom, not an instance of a symptom occurrence)
     public class Symptom
     {
         [Key]

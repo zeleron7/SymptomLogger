@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Serilog;
-using SymptomLogger.src.AutoMapper;
+//using SymptomLogger.src.AutoMapper;
 using SymptomLogger.src.Data;
 using SymptomLogger.src.Entity;
 using SymptomLogger.src.Middleware;
@@ -48,7 +48,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 // AutoMapper
 //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); < older way, which can lead to issues if there are multiple profiles or assemblies. 
-builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
+//builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
 // Dependency Injection 
 #region DI
@@ -79,6 +79,12 @@ builder.Services.AddFluentValidationAutoValidation();
 // Global exception handling
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+// Configure routing to use lowercase URLs
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.LowercaseUrls = true;
+});
 
 builder.Services.AddSwaggerGen(options =>
 {

@@ -103,9 +103,9 @@ namespace SymptomLogger.src.Controllers
         {
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, patient.Email),
+            new Claim(JwtRegisteredClaimNames.Sub, patient.Id),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, patient.Id)
+            new Claim(ClaimTypes.Email, patient.Email)
         };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

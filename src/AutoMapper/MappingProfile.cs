@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿//using AutoMapper;
 using SymptomLogger.src.DTO.Patient;
 using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.Entity;
@@ -7,7 +7,7 @@ using SymptomLogger.src.DTO.Condition;
 
 namespace SymptomLogger.src.AutoMapper
 {
-    public class MappingProfile : Profile
+    /*public class MappingProfile : Profile
     {
         public MappingProfile()
         {
@@ -43,5 +43,5 @@ namespace SymptomLogger.src.AutoMapper
             CreateMap<Condition, ResponseConditionDTO>();
             #endregion 
         }
-    }
+    }*/
 }

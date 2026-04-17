@@ -7,7 +7,7 @@ namespace SymptomLogger.src.Entity
     {
         [Key]
         public int ConditionId { get; set; } // Primary key
-        public string Name { get; set; }
+        public string Name { get; set; } // e.g., "Rheumatoid Arthritis", "Crohn's Disease", "Multiple Sclerosis"
         public string System { get; set; } // e.g., "Musculoskeletal", "Digestive", "Neurological"
         public string IcdCode { get; set; } // ICD code for standardized condition classification
     }

@@ -58,16 +58,9 @@ namespace SymptomLogger.src.Data
             // SymptomLogEntry > Symptom relationship
             builder.Entity<SymptomLogEntry>()
                 .HasOne(sle => sle.Symptom)
-                .WithMany() // No navigation property in Symptom for SymptomLogEntries
+                .WithMany() 
                 .HasForeignKey(sle => sle.SymptomId)
                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes to avoid deleting symptoms when a log entry is deleted
-
-            // SymptomLog > Symptom relationship
-            /*builder.Entity<SymptomLog>()
-                .HasOne(sl => sl.Symptom)
-                .WithMany() 
-                .HasForeignKey(s => s.SymptomId)
-                .OnDelete(DeleteBehavior.Restrict);*/ // Prevent cascading deletes to avoid deleting symptoms when a log is deleted
 
             // ConditionSymptom > Condition relationship
             builder.Entity<ConditionSymptom>()
