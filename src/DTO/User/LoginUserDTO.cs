@@ -1,6 +1,6 @@
 ﻿namespace SymptomLogger.src.DTO.Patient
 {
-    public class LoginPatientDTO
+    public class LoginUserDTO
     {
         // Add username as an option for login?
         public string Email { get; set; } = "";

@@ -63,8 +63,8 @@ namespace SymptomLogger.src.Controllers
         public async Task<ActionResult<ResponseSymptomDTO>> GetSymptom(int id)
         {
             _logger.LogInformation("Retrieving symptom with ID {SymptomId}.", id);
-            var patientId = RetrievePatientId.GetPatientId(User);
-            var symptom = await _symptomService.GetSymptomByIdAsync(id, patientId);
+            var userId = RetrieveUserId.GetUserId(User);
+            var symptom = await _symptomService.GetSymptomByIdAsync(id, userId);
             
             _logger.LogInformation("Symptom with ID {SymptomId} retrieved successfully.", id);
             return Ok(symptom);
@@ -78,9 +78,9 @@ namespace SymptomLogger.src.Controllers
         public async Task<ActionResult<ResponseSymptomDTO>> AddSymptom(CreateSymptomDTO dto)
         {
             _logger.LogInformation("Creating new symptom");
-            // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
-            var patientId = RetrievePatientId.GetPatientId(User);
-            var createdSymptom = await _symptomService.AddSymptomAsync(dto, patientId);
+            // Retrieve user ID from the authenticated user's claims and pass it to the service layer
+            var userId = RetrieveUserId.GetUserId(User);
+            var createdSymptom = await _symptomService.AddSymptomAsync(dto, userId);
 
             _logger.LogInformation("Symptom created successfully with Description {Description}.", createdSymptom.Description);
             return Ok(createdSymptom);
@@ -95,10 +95,10 @@ namespace SymptomLogger.src.Controllers
         public async Task<IActionResult> UpdateSymptom(int id, [FromBody] JsonPatchDocument<UpdateSymptomDTO> patchDoc)
         {
             _logger.LogInformation("Updating symptom with ID {SymptomId}.", id);
-            // Retrieve patient ID from the authenticated user's claims and pass it to the service layer
-            var patientId = RetrievePatientId.GetPatientId(User);
+            // Retrieve user ID from the authenticated user's claims and pass it to the service layer
+            var userId = RetrieveUserId.GetUserId(User);
 
-            var updatedSymptom = await _symptomService.UpdateSymptomAsync(id, patchDoc, patientId);
+            var updatedSymptom = await _symptomService.UpdateSymptomAsync(id, patchDoc, userId);
             _logger.LogInformation("Symptom with ID {SymptomId} updated successfully.", id);
 
             return Ok(updatedSymptom);
@@ -114,8 +114,8 @@ namespace SymptomLogger.src.Controllers
         {
             _logger.LogInformation("Deleting symptom with ID {SymptomId}.", id);
 
-            var patientId = RetrievePatientId.GetPatientId(User);
-            var success = await _symptomService.DeleteSymptomAsync(id, patientId);
+            var userId = RetrieveUserId.GetUserId(User);
+            var success = await _symptomService.DeleteSymptomAsync(id, userId);
 
             if (!success)
             {

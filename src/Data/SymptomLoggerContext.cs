@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace SymptomLogger.src.Data
 {
-    public class SymptomLoggerContext : IdentityDbContext<Patient>
+    public class SymptomLoggerContext : IdentityDbContext<User>
     {
         public SymptomLoggerContext(DbContextOptions<SymptomLoggerContext> options)
             : base(options)
@@ -24,9 +24,9 @@ namespace SymptomLogger.src.Data
 
             // Custom configurations for Identity tables
             #region Identity table configurations
-            builder.Entity<Patient>(entity =>
+            builder.Entity<User>(entity =>
             {
-                entity.ToTable(name: "Patients");
+                entity.ToTable(name: "Users");
             });
             builder.Entity<IdentityRole>(entity =>
             {
@@ -37,17 +37,17 @@ namespace SymptomLogger.src.Data
             // Custom configurations for application tables
             #region Relationship configurations
 
-            // Symptom > Patient relationship
+            // Symptom > User relationship
             builder.Entity<Symptom>()
-                .HasOne(s => s.Patient)
+                .HasOne(s => s.User)
                 .WithMany(s => s.Symptoms)
-                .HasForeignKey(s => s.PatientId);
+                .HasForeignKey(s => s.UserId);
 
-            // SymptomLog > Patient relationship
+            // SymptomLog > User relationship
             builder.Entity<SymptomLog>()
-                .HasOne(sl => sl.Patient)
+                .HasOne(sl => sl.User)
                 .WithMany(sl => sl.SymptomLogs)
-                .HasForeignKey(sl => sl.PatientId);
+                .HasForeignKey(sl => sl.UserId);
 
             // SymptomLogEntry > SymptomLog relationship
             builder.Entity<SymptomLogEntry>()
@@ -84,7 +84,7 @@ namespace SymptomLogger.src.Data
             );*/
             #endregion 
         }
-        public DbSet<Patient> Patient { get; set; }
+        public DbSet<User> User { get; set; }
         public DbSet<SymptomLog> SymptomLog { get; set; }
         public DbSet<Symptom> Symptom { get; set; }
         public DbSet<Condition> Condition { get; set; }

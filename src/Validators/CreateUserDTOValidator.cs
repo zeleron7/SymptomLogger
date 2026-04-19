@@ -3,10 +3,10 @@ using SymptomLogger.src.DTO.Patient;
 
 namespace SymptomLogger.src.Validators
 {
-    public class CreatePatientDTOValidator : AbstractValidator<CreatePatientDTO>
+    public class CreateUserDTOValidator : AbstractValidator<CreateUserDTO>
     {
         // Validator for CreatePatientDTO (request)
-        public CreatePatientDTOValidator() 
+        public CreateUserDTOValidator() 
         {
             RuleFor(x => x.FirstName)
                 .NotEqual("string", StringComparer.OrdinalIgnoreCase)

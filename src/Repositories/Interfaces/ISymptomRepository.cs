@@ -7,8 +7,8 @@ namespace SymptomLogger.src.Repositories.Interfaces
         // Symptoms
         IQueryable<Symptom> GetSymptoms();
         Task<Symptom> GetSymptomById(int id);
-        Task<Symptom> AddSymptom(Symptom symptom, string patientId);
-        Task<Symptom> UpdateSymptom(Symptom symptom, string patientId);
+        Task<Symptom> AddSymptom(Symptom symptom, string userId);
+        Task<Symptom> UpdateSymptom(Symptom symptom, string userId);
         Task<bool> DeleteSymptom(int id);
     }
 }

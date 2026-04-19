@@ -3,16 +3,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SymptomLogger.src.Entity
 {
-    public class Patient : IdentityUser
+    public class User : IdentityUser
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
 
-        // Patient can have multiple symptoms
+        // User can have multiple symptoms
         public ICollection<Symptom> Symptoms { get; set; } = new List<Symptom>();
 
-        // Patient can have multiple symptom logs
+        // User can have multiple symptom logs
         public ICollection<SymptomLog> SymptomLogs { get; set; } = new List<SymptomLog>();
     }
 }

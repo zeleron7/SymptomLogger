@@ -15,8 +15,8 @@ namespace SymptomLogger.src.Entity
         public int SleepHours { get; set; }
         public bool isFlare { get; set; } // Indicates if this log entry represents a flare-up of symptoms
 
-        public  Patient Patient { get; set; } // Navigation property to Patient
-        public string PatientId { get; set; } // Foreign key
+        public  User User { get; set; } // Navigation property to User
+        public string UserId { get; set; } // Foreign key
 
         // SymptomLog can have multiple SymptomLogEntries, representing different symptoms logged at the same time
         public ICollection<SymptomLogEntry> SymptomLogEntries { get; set; } 

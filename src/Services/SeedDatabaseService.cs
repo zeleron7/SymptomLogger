@@ -36,14 +36,14 @@ namespace SymptomLogger.src.Services
                     _logger.LogWarning("Failed to deserialize symptoms from JSON.");
                     throw new ArgumentNullException("Failed to deserialize symptoms from JSON.");
                 }
-                // get first patient to assign symptoms to (FOR TESTING PURPOSE)
+                // get first user to assign symptoms to (FOR TESTING PURPOSE)
                 // ASSIGN TO ADMIN USER LATER
-                var patient = _context.Patient.FirstOrDefault();
+                var user = _context.User.FirstOrDefault();
 
-                // assign patient Id to each symptom
+                // assign user Id to each symptom
                 foreach (var symptom in symptoms)
                 {
-                    symptom.PatientId = patient.Id;
+                    symptom.UserId = user.Id;
                 }
 
                 await _context.AddRangeAsync(symptoms);

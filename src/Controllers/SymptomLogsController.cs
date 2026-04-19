@@ -59,9 +59,9 @@ namespace SymptomLogger.src.Controllers
         public async Task<ActionResult<ResponseSymptomLogDTO>> GetSymptomLog(int id)
         {
             _logger.LogInformation("Retrieving symptom with ID {SymptomId}.", id);
-            var patientId = RetrievePatientId.GetPatientId(User);
+            var userId = RetrieveUserId.GetUserId(User);
 
-            var symptom = await _symptomLogService.GetSymptomLogByIdAsync(id, patientId);
+            var symptom = await _symptomLogService.GetSymptomLogByIdAsync(id, userId);
             _logger.LogInformation("Symptom with ID {SymptomId} retrieved successfully.", id);
 
             return Ok(symptom);
@@ -75,9 +75,9 @@ namespace SymptomLogger.src.Controllers
         public async Task<ActionResult<ResponseSymptomLogDTO>> AddSymptomLog(CreateSymptomLogDTO dto)
         {
             _logger.LogInformation("Creating new symptom log");
-            var patientId = RetrievePatientId.GetPatientId(User);
+            var userId = RetrieveUserId.GetUserId(User);
 
-            var createdSymptom = await _symptomLogService.AddSymptomLogAsync(dto, patientId);
+            var createdSymptom = await _symptomLogService.AddSymptomLogAsync(dto, userId);
             _logger.LogInformation("Symptom log created successfully with Note {Notes}.", createdSymptom.Notes);
 
             return Ok(createdSymptom);
@@ -92,9 +92,9 @@ namespace SymptomLogger.src.Controllers
         public async Task<IActionResult> UpdateSymptomLog(int id, [FromBody] JsonPatchDocument<UpdateSymptomLogDTO> patchDoc)
         {
             _logger.LogInformation("Updating symptom log with ID {SymptomId}.", id);
-            var patientId = RetrievePatientId.GetPatientId(User);
+            var userId = RetrieveUserId.GetUserId(User);
 
-            var updatedSymptomLog = await _symptomLogService.UpdateSymptomLogAsync(id, patchDoc, patientId);
+            var updatedSymptomLog = await _symptomLogService.UpdateSymptomLogAsync(id, patchDoc, userId);
             _logger.LogInformation("Symptom log with ID {SymptomId} updated successfully.", id);
 
             return Ok(updatedSymptomLog);
@@ -109,8 +109,8 @@ namespace SymptomLogger.src.Controllers
         {
             _logger.LogInformation("Deleting symptom log with ID {SymptomId}.", id);
 
-            var patientId = RetrievePatientId.GetPatientId(User);
-            var success = await _symptomLogService.DeleteSymptomLogAsync(id, patientId);
+            var userId = RetrieveUserId.GetUserId(User);
+            var success = await _symptomLogService.DeleteSymptomLogAsync(id, userId);
 
             if (!success)
             {

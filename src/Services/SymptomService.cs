@@ -32,6 +32,7 @@ namespace SymptomLogger.src.Services
             return _symptomRepository.GetSymptoms()
                 .Select(c => new ResponseSymptomDTO
                 {
+                    SymptomId = c.SymptomId,
                     Category = c.Category,
                     Description = c.Description ?? string.Empty,
                     Name = c.Name,
@@ -41,7 +42,7 @@ namespace SymptomLogger.src.Services
 
         // Get symptom by ID
         #region GetSymptomByIdAsync
-        public async Task<ResponseSymptomDTO> GetSymptomByIdAsync(int id, string patientId)
+        public async Task<ResponseSymptomDTO> GetSymptomByIdAsync(int id, string userId)
         {
             var symptomById = await _symptomRepository.GetSymptomById(id);
 
@@ -51,8 +52,8 @@ namespace SymptomLogger.src.Services
                 throw new NotFoundException($"Symptom with ID {id} not found.");
             }
 
-            // validate patient ID to ensure the symptom being accessed belongs to the authenticated patient
-            if (symptomById.PatientId != patientId) 
+            // validate user ID to ensure the symptom being accessed belongs to the authenticated user
+            if (symptomById.UserId != userId)
             {
                 _logger.LogWarning("User tried to retrieve symptom ID {SymptomId}", id);
                 throw new UnauthorizedAccessException();
@@ -72,7 +73,7 @@ namespace SymptomLogger.src.Services
 
         // Add new symptom
         #region AddSymptomAsync
-        public async Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto, string patientId)
+        public async Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto, string userId)
         {
             if (dto == null)
             {
@@ -89,10 +90,10 @@ namespace SymptomLogger.src.Services
                 BodySystem = dto.BodySystem,
             };
 
-            // set the patientId passed from the controller to ensure the symptom is associated with the correct patient
-            symptom.PatientId = patientId;
+            // set the userId passed from the controller to ensure the symptom is associated with the correct user
+            symptom.UserId = userId;
 
-            var CreatedSymptom = await _symptomRepository.AddSymptom(symptom, patientId);
+            var CreatedSymptom = await _symptomRepository.AddSymptom(symptom, userId);
 
             // map the created symptom entity to the response DTO
             var responseDto = new ResponseSymptomDTO
@@ -109,7 +110,7 @@ namespace SymptomLogger.src.Services
 
         // Update symptom
         #region UpdateSymptomAsync
-        public async Task<ResponseSymptomDTO> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc, string patientId)
+        public async Task<ResponseSymptomDTO> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc, string userId)
         {
             if (patchDoc == null)
             {
@@ -119,7 +120,7 @@ namespace SymptomLogger.src.Services
 
             var symptomToUpdate = await _symptomRepository.GetSymptomById(id);
 
-            if (symptomToUpdate.PatientId != patientId)
+            if (symptomToUpdate.UserId != userId)
             {
                 _logger.LogWarning("Unknown user tried to update symptom with ID {SymptomId}", id);
                 throw new UnauthorizedAccessException();
@@ -152,9 +153,9 @@ namespace SymptomLogger.src.Services
             symptomToUpdate.Description = updatedDto.Description;
             #endregion 
 
-            symptomToUpdate.PatientId = patientId; // ensure the patientId is set to the authenticated patient's ID to prevent unauthorized updates
+            symptomToUpdate.UserId = userId; // ensure the userId is set to the authenticated user's ID to prevent unauthorized updates
 
-            var UpdatedSymptom = await _symptomRepository.UpdateSymptom(symptomToUpdate, patientId);
+            var UpdatedSymptom = await _symptomRepository.UpdateSymptom(symptomToUpdate, userId);
             //return _mapper.Map<ResponseSymptomDTO>(UpdatedSymptom);
             var responseDto = new ResponseSymptomDTO
             {
@@ -169,10 +170,10 @@ namespace SymptomLogger.src.Services
 
         // Delete symptom by ID
         #region DeleteSymptomAsync
-        public async Task<bool> DeleteSymptomAsync(int id, string patientId)
+        public async Task<bool> DeleteSymptomAsync(int id, string userId)
         {
             var symptom = await _symptomRepository.GetSymptomById(id);
-            if (symptom.PatientId != patientId)
+            if (symptom.UserId != userId)
             {
                 _logger.LogWarning("Unknown user tried to delete symptom with ID {SymptomId}", id);
                 throw new UnauthorizedAccessException();
@@ -183,7 +184,7 @@ namespace SymptomLogger.src.Services
             {
                 return false;
             }
-            symptom.PatientId = patientId;
+            symptom.UserId = userId;
             
             return await _symptomRepository.DeleteSymptom(id);
         }

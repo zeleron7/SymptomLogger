@@ -206,7 +206,109 @@ namespace SymptomLogger.Migrations
                     b.ToTable("ConditionSymptom");
                 });
 
-            modelBuilder.Entity("SymptomLogger.src.Entity.Patient", b =>
+            modelBuilder.Entity("SymptomLogger.src.Entity.Symptom", b =>
+                {
+                    b.Property<int>("SymptomId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SymptomId"));
+
+                    b.Property<string>("BodySystem")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("SymptomId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Symptom");
+                });
+
+            modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLog", b =>
+                {
+                    b.Property<int>("SymptomLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SymptomLogId"));
+
+                    b.Property<int>("DurationMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LoggedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SleepHours")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StressLevel")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("isFlare")
+                        .HasColumnType("bit");
+
+                    b.HasKey("SymptomLogId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SymptomLog");
+                });
+
+            modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLogEntry", b =>
+                {
+                    b.Property<int>("SymptomLogEntryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SymptomLogEntryId"));
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SymptomId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SymptomLogId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SymptomName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SymptomLogEntryId");
+
+                    b.HasIndex("SymptomId");
+
+                    b.HasIndex("SymptomLogId");
+
+                    b.ToTable("SymptomLogEntry");
+                });
+
+            modelBuilder.Entity("SymptomLogger.src.Entity.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -279,109 +381,7 @@ namespace SymptomLogger.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("Patients", (string)null);
-                });
-
-            modelBuilder.Entity("SymptomLogger.src.Entity.Symptom", b =>
-                {
-                    b.Property<int>("SymptomId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SymptomId"));
-
-                    b.Property<string>("BodySystem")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PatientId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("SymptomId");
-
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("Symptom");
-                });
-
-            modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLog", b =>
-                {
-                    b.Property<int>("SymptomLogId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SymptomLogId"));
-
-                    b.Property<int>("DurationMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("LoggedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PatientId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("SleepHours")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StressLevel")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("isFlare")
-                        .HasColumnType("bit");
-
-                    b.HasKey("SymptomLogId");
-
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("SymptomLog");
-                });
-
-            modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLogEntry", b =>
-                {
-                    b.Property<int>("SymptomLogEntryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SymptomLogEntryId"));
-
-                    b.Property<int>("Severity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SymptomId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SymptomLogId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SymptomName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("SymptomLogEntryId");
-
-                    b.HasIndex("SymptomId");
-
-                    b.HasIndex("SymptomLogId");
-
-                    b.ToTable("SymptomLogEntry");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -395,7 +395,7 @@ namespace SymptomLogger.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("SymptomLogger.src.Entity.Patient", null)
+                    b.HasOne("SymptomLogger.src.Entity.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -404,7 +404,7 @@ namespace SymptomLogger.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("SymptomLogger.src.Entity.Patient", null)
+                    b.HasOne("SymptomLogger.src.Entity.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -419,7 +419,7 @@ namespace SymptomLogger.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SymptomLogger.src.Entity.Patient", null)
+                    b.HasOne("SymptomLogger.src.Entity.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -428,7 +428,7 @@ namespace SymptomLogger.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("SymptomLogger.src.Entity.Patient", null)
+                    b.HasOne("SymptomLogger.src.Entity.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -456,24 +456,24 @@ namespace SymptomLogger.Migrations
 
             modelBuilder.Entity("SymptomLogger.src.Entity.Symptom", b =>
                 {
-                    b.HasOne("SymptomLogger.src.Entity.Patient", "Patient")
+                    b.HasOne("SymptomLogger.src.Entity.User", "User")
                         .WithMany("Symptoms")
-                        .HasForeignKey("PatientId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Patient");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLog", b =>
                 {
-                    b.HasOne("SymptomLogger.src.Entity.Patient", "Patient")
+                    b.HasOne("SymptomLogger.src.Entity.User", "User")
                         .WithMany("SymptomLogs")
-                        .HasForeignKey("PatientId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Patient");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLogEntry", b =>
@@ -495,16 +495,16 @@ namespace SymptomLogger.Migrations
                     b.Navigation("SymptomLog");
                 });
 
-            modelBuilder.Entity("SymptomLogger.src.Entity.Patient", b =>
+            modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLog", b =>
+                {
+                    b.Navigation("SymptomLogEntries");
+                });
+
+            modelBuilder.Entity("SymptomLogger.src.Entity.User", b =>
                 {
                     b.Navigation("SymptomLogs");
 
                     b.Navigation("Symptoms");
-                });
-
-            modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLog", b =>
-                {
-                    b.Navigation("SymptomLogEntries");
                 });
 #pragma warning restore 612, 618
         }

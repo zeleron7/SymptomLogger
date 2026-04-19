@@ -14,7 +14,7 @@ namespace SymptomLogger.src.Entity
         public string? Description { get; set; }
         // add bool isActive for soft delete?
 
-        public Patient Patient { get; set; } // Navigation property to Patient
-        public string PatientId { get; set; } // Foreign key
+        public User User { get; set; } // Navigation property to User
+        public string UserId { get; set; } // Foreign key
     }
 }

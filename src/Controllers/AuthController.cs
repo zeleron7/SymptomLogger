@@ -21,12 +21,12 @@ namespace SymptomLogger.src.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
-        private readonly UserManager<Patient> _userManager;
-        private readonly SignInManager<Patient> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly IConfiguration _configuration;
         public AuthController(
-            UserManager<Patient> userManager,
-            SignInManager<Patient> signInManager,
+            UserManager<User> userManager,
+            SignInManager<User> signInManager,
             IConfiguration configuration,
             ILogger<AuthController> logger)
         {
@@ -39,23 +39,24 @@ namespace SymptomLogger.src.Controllers
         // POST: api/Auth/register
         #region Register
         [HttpPost("register")]
-        public async Task<IActionResult> Register(CreatePatientDTO register)
+        public async Task<IActionResult> Register(CreateUserDTO register)
         {
             // map dto to entity
-            var patient = new Patient
+            var user = new User
             {
+                FirstName = register.FirstName,
+                LastName = register.LastName,
+                Age = register.Age,
                 UserName = register.UserName,
                 Email = register.Email,
-                FirstName = register.FirstName,
-                LastName = register.LastName
             };
 
-            var result = await _userManager.CreateAsync(patient, register.Password);
+            var result = await _userManager.CreateAsync(user, register.Password);
             if (result.Succeeded)
             {
                 // add roles if needed
 
-                _logger.LogInformation("New patient registered with email {Email}.", register.Email);
+                _logger.LogInformation("New user registered with email {Email}.", register.Email);
                 return Ok(new { message = "Registration successful" });
             }
             _logger.LogWarning("Registration failed for email {Email}.", register.Email);
@@ -66,19 +67,19 @@ namespace SymptomLogger.src.Controllers
         // POST: api/Auth/login
         #region Login
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginPatientDTO model)
+        public async Task<IActionResult> Login(LoginUserDTO login)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByEmailAsync(login.Email);
             if (user == null)
             {
-                _logger.LogWarning("Login attempt failed for email {Email}. User not found.", model.Email);
+                _logger.LogWarning("Login attempt failed for email {Email}. User not found.", login.Email);
                 return BadRequest("Invalid credentials");
             }
             var result = await _signInManager.CheckPasswordSignInAsync(
-                user, model.Password, lockoutOnFailure: false);
+                user, login.Password, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                _logger.LogInformation("Patient with email {Email} logged in successfully.", model.Email);
+                _logger.LogInformation("User with email {Email} logged in successfully.", login.Email);
                 var token = GenerateJwtToken(user);
                 return Ok(new { token });
             }
@@ -99,7 +100,7 @@ namespace SymptomLogger.src.Controllers
 
         // Generate JWT token
         #region GenerateJwtToken
-        private string GenerateJwtToken(Patient patient)
+        private string GenerateJwtToken(User patient)
         {
             var claims = new[]
             {

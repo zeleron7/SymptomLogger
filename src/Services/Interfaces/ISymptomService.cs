@@ -10,9 +10,9 @@ namespace SymptomLogger.src.Services.Interfaces
     {
         // Symptoms
         IQueryable<ResponseSymptomDTO> GetSymptoms();
-        Task<ResponseSymptomDTO> GetSymptomByIdAsync(int id, string patientId);
-        Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto, string patientId);
-        Task<ResponseSymptomDTO> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc, string patientId);
-        Task<bool> DeleteSymptomAsync(int id, string patientId);
+        Task<ResponseSymptomDTO> GetSymptomByIdAsync(int id, string userId);
+        Task<ResponseSymptomDTO> AddSymptomAsync(CreateSymptomDTO dto, string userId);
+        Task<ResponseSymptomDTO> UpdateSymptomAsync(int id, JsonPatchDocument<UpdateSymptomDTO> patchDoc, string userId);
+        Task<bool> DeleteSymptomAsync(int id, string userId);
     }
 }

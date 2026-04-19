@@ -70,7 +70,7 @@ builder.Services.AddScoped<ConditionSeeder>();
 #endregion 
 
 // Register FluentValidation validators
-builder.Services.AddValidatorsFromAssemblyContaining<CreatePatientDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDTOValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateSymptomDTOValidator>();
 
 // Enable automatic validation of DTOs using FluentValidation
@@ -110,7 +110,7 @@ builder.Services.AddSwaggerGen(options =>
 // Identity and JWT configuration
 #region Identity and JWT configuration
 // Configure Identity
-builder.Services.AddIdentity<Patient, IdentityRole>(options =>
+builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     // Password settings
     options.Password.RequireDigit = true;

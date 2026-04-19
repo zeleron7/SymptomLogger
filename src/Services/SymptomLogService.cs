@@ -46,7 +46,7 @@ namespace SymptomLogger.src.Services
 
         // Get symptom log by ID
         #region GetSymptomLogByIdAsync
-        public async Task<ResponseSymptomLogDTO> GetSymptomLogByIdAsync(int id, string patientId)
+        public async Task<ResponseSymptomLogDTO> GetSymptomLogByIdAsync(int id, string userId)
         {
             var symptomLogById = await _symptomLogRepository.GetSymptomLogById(id);
 
@@ -56,8 +56,8 @@ namespace SymptomLogger.src.Services
                 throw new NotFoundException($"Symptom log with ID {id} not found.");
             }
 
-            // validate patient ID to ensure the symptom log being accessed belongs to the authenticated patient
-            if (symptomLogById.PatientId != patientId)
+            // validate user ID to ensure the symptom log being accessed belongs to the authenticated user
+            if (symptomLogById.UserId != userId)
             {
                 _logger.LogWarning("User tried to retrieve symptom log ID {SymptomLogId}", id);
                 throw new UnauthorizedAccessException("You are not authorized to access this symptom log.");
@@ -80,7 +80,7 @@ namespace SymptomLogger.src.Services
 
         // Add new symptom log
         #region AddSymptomLogAsync
-        public async Task<ResponseSymptomLogDTO> AddSymptomLogAsync(CreateSymptomLogDTO dto, string patientId)
+        public async Task<ResponseSymptomLogDTO> AddSymptomLogAsync(CreateSymptomLogDTO dto, string userId)
         {
             if (dto == null)
             {
@@ -92,7 +92,7 @@ namespace SymptomLogger.src.Services
             #region MappingRequest
             var symptomLog = new SymptomLog
             {
-                PatientId = patientId, // set the patientId on the symptom log to ensure it is associated with the correct patient
+                UserId = userId, // set the userId on the symptom log to ensure it is associated with the correct user
                 Notes = dto.Notes,
                 DurationMinutes = dto.DurationMinutes ?? 0,
                 StressLevel = dto.StressLevel ?? 0,
@@ -108,7 +108,7 @@ namespace SymptomLogger.src.Services
             };
             #endregion 
 
-            var CreatedSymptomLog = await _symptomLogRepository.AddSymptomLog(symptomLog, patientId);
+            var CreatedSymptomLog = await _symptomLogRepository.AddSymptomLog(symptomLog, userId);
 
             // Map the created symptom log entity back to response DTO
             #region MappingResponse
@@ -136,7 +136,7 @@ namespace SymptomLogger.src.Services
         // Update symptom
         #region UpdateSymptomAsync
         public async Task<ResponseSymptomLogDTO> UpdateSymptomLogAsync(int id, JsonPatchDocument<UpdateSymptomLogDTO> patchDoc, 
-            string patientId)
+            string userId)
         {
             if (patchDoc == null)
             {
@@ -145,7 +145,7 @@ namespace SymptomLogger.src.Services
             }
             var symptomLogToUpdate = await _symptomLogRepository.GetSymptomLogById(id);
 
-            if (symptomLogToUpdate.PatientId != patientId)
+            if (symptomLogToUpdate.UserId != userId)
             {
                 _logger.LogWarning("Unknown user tried to update symptom log with ID {SymptomId}", id);
                 throw new UnauthorizedAccessException();
@@ -175,17 +175,16 @@ namespace SymptomLogger.src.Services
             // copy DTO values back into the tracked entity (preserve keys)
             #region copyValues
             symptomLogToUpdate.Notes = updatedDto.Notes;
-            //symptomLogToUpdate.Severity = updatedDto.Severity;
             symptomLogToUpdate.DurationMinutes = updatedDto.DurationMinutes ?? 0;
             symptomLogToUpdate.StressLevel = updatedDto.StressLevel ?? 0;
             symptomLogToUpdate.SleepHours = updatedDto.SleepHours ?? 0;
             symptomLogToUpdate.isFlare = updatedDto.isFlare;
             #endregion 
 
-            // ensure the patientId is set on the entity to prevent unauthorized updates
-            symptomLogToUpdate.PatientId = patientId;
+            // ensure the userId is set on the entity to prevent unauthorized updates
+            symptomLogToUpdate.UserId = userId;
 
-            var updated = await _symptomLogRepository.UpdateSymptomLog(symptomLogToUpdate, patientId);
+            var updated = await _symptomLogRepository.UpdateSymptomLog(symptomLogToUpdate, userId);
 
             // map the updated entity back to response DTO
             #region responseDto
@@ -206,10 +205,10 @@ namespace SymptomLogger.src.Services
 
         // Delete symptom by ID
         #region DeleteSymptomAsync
-        public async Task<bool> DeleteSymptomLogAsync(int id, string patientId)
+        public async Task<bool> DeleteSymptomLogAsync(int id, string userId)
         {
             var symptomLog = await _symptomLogRepository.GetSymptomLogById(id);
-            if (symptomLog.PatientId != patientId)
+            if (symptomLog.UserId != userId)
             {
                 _logger.LogWarning("Unknown user tried to delete symptom log with ID {SymptomId}", id);
                 throw new UnauthorizedAccessException();
@@ -220,7 +219,7 @@ namespace SymptomLogger.src.Services
             {
                 return false;
             }
-            symptomLog.PatientId = patientId; // ensure the patientId is set on the entity to prevent unauthorized deletions
+            symptomLog.UserId = userId; // ensure the userId is set on the entity to prevent unauthorized deletions
 
             return await _symptomLogRepository.DeleteSymptomLog(id);
         }
