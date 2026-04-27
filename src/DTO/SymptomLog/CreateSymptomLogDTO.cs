@@ -1,9 +1,11 @@
-﻿using SymptomLogger.src.DTO.SymptomLogEntry;
+﻿using SymptomLogger.src.DTO.Condition;
+using SymptomLogger.src.DTO.SymptomLogEntry;
 
 namespace SymptomLogger.src.DTO.SymptomLog
 {
     public class CreateSymptomLogDTO
     {
+        public int ConditionId { get; set; }
         public int SymptomId { get; set; }
         public string Notes { get; set; } = "";
         

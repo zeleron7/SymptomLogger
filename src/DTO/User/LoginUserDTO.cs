@@ -1,4 +1,4 @@
-﻿namespace SymptomLogger.src.DTO.Patient
+﻿namespace SymptomLogger.src.DTO.User
 {
     public class LoginUserDTO
     {

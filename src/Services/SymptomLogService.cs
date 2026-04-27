@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.JsonPatch;
+using NuGet.ProjectModel;
 using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.DTO.SymptomLog;
 using SymptomLogger.src.DTO.SymptomLogEntry;
@@ -31,6 +32,7 @@ namespace SymptomLogger.src.Services
                 .Select(c => new ResponseSymptomLogDTO // manual mapping
                 {
                     Notes = c.Notes,
+                    LoggedAt = c.LoggedAt,
                     DurationMinutes = c.DurationMinutes,
                     StressLevel = c.StressLevel,
                     SleepHours = c.SleepHours,
@@ -93,6 +95,7 @@ namespace SymptomLogger.src.Services
             var symptomLog = new SymptomLog
             {
                 UserId = userId, // set the userId on the symptom log to ensure it is associated with the correct user
+                ConditionId = dto.ConditionId, // set the condition ID on the symptom log to establish the relationship
                 Notes = dto.Notes,
                 DurationMinutes = dto.DurationMinutes ?? 0,
                 StressLevel = dto.StressLevel ?? 0,

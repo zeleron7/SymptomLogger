@@ -31,6 +31,7 @@ namespace SymptomLogger.src.Services
             return _conditionRepository.GetConditions()
                 .Select(c => new ResponseConditionDTO // manual mapping 
                 {
+                    ConditionId = c.ConditionId,
                     Name = c.Name,
                     System = c.System,
                     IcdCode = c.IcdCode // handle null value ? 

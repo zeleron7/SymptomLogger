@@ -248,6 +248,9 @@ namespace SymptomLogger.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SymptomLogId"));
 
+                    b.Property<int>("ConditionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
 
@@ -272,6 +275,8 @@ namespace SymptomLogger.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("SymptomLogId");
+
+                    b.HasIndex("ConditionId");
 
                     b.HasIndex("UserId");
 
@@ -467,11 +472,19 @@ namespace SymptomLogger.Migrations
 
             modelBuilder.Entity("SymptomLogger.src.Entity.SymptomLog", b =>
                 {
+                    b.HasOne("SymptomLogger.src.Entity.Condition", "Condition")
+                        .WithMany()
+                        .HasForeignKey("ConditionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("SymptomLogger.src.Entity.User", "User")
                         .WithMany("SymptomLogs")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Condition");
 
                     b.Navigation("User");
                 });

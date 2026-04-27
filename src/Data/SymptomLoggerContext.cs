@@ -49,6 +49,13 @@ namespace SymptomLogger.src.Data
                 .WithMany(sl => sl.SymptomLogs)
                 .HasForeignKey(sl => sl.UserId);
 
+            // SymptomLog > Condition relationship
+            builder.Entity<SymptomLog>()
+                .HasOne(sl => sl.Condition)
+                .WithMany()
+                .HasForeignKey(sl => sl.ConditionId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading deletes to avoid deleting conditions when a log is deleted
+
             // SymptomLogEntry > SymptomLog relationship
             builder.Entity<SymptomLogEntry>()
                 .HasOne(sle => sle.SymptomLog)

@@ -1,5 +1,5 @@
 ﻿//using AutoMapper;
-using SymptomLogger.src.DTO.Patient;
+using SymptomLogger.src.DTO.User;
 using SymptomLogger.src.DTO.Symptom;
 using SymptomLogger.src.Entity;
 using SymptomLogger.src.DTO.SymptomLog;

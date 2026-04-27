@@ -18,8 +18,11 @@ namespace SymptomLogger.src.Entity
         public  User User { get; set; } // Navigation property to User
         public string UserId { get; set; } // Foreign key
 
+        public Condition Condition { get; set; } // Navigation property to Condition
+        public int ConditionId { get; set; } // Foreign key
+
         // SymptomLog can have multiple SymptomLogEntries, representing different symptoms logged at the same time
-        public ICollection<SymptomLogEntry> SymptomLogEntries { get; set; } 
+        public ICollection<SymptomLogEntry> SymptomLogEntries { get; set; }
     }
 }
     

@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using SymptomLogger.src.DTO.Patient;
+using SymptomLogger.src.DTO.User;
 
 namespace SymptomLogger.src.Validators
 {
     public class CreateUserDTOValidator : AbstractValidator<CreateUserDTO>
     {
-        // Validator for CreatePatientDTO (request)
+        // Validator for CreateUserDTO (request)
         public CreateUserDTOValidator() 
         {
             RuleFor(x => x.FirstName)
@@ -18,7 +18,6 @@ namespace SymptomLogger.src.Validators
 
             RuleFor(x => x.Age)
                 .GreaterThan(0).WithMessage("Age must be greater than 0.");
-
         }
     }
 }
